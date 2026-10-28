@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electrochemical impedance spectroscopy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..700&family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+
+
+
+:root{
+  --paper:#E6EEE8;
+  --paper-line:rgba(46,105,72,.075);
+  --sheet:#FAFCFA;
+  --ink:#18242F;
+  --ink-soft:#4A5866;
+  --rule:#B6C6BB;
+  --plot-grid:#E2E9E4;
+  --anodic:#B02F28;
+  --cathodic:#1E539C;
+  --transport:#95600F;
+  --window:rgba(30,83,156,.09);
+  --sans:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --serif:"Literata",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.65;
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--paper-line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--paper-line) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+math{font-family:"STIX Two Math","Cambria Math","Latin Modern Math",math;font-size:1.08em}
+.katex{display:inline}
+.eq math[display=block],.hero-eq math[display=block]{display:inline math;math-style:normal}
+.eq{display:block;margin:1.1rem 0 1.3rem;overflow-x:auto;padding:.2rem 0 .2rem 1.5em}
+.eq math{font-size:1.25em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.prose{max-width:68ch}
+a{color:var(--cathodic)}
+:focus-visible{outline:3px solid var(--transport);outline-offset:2px}
+
+/* header */
+.top{border-bottom:1px solid var(--rule);background:rgba(230,238,232,.92);position:sticky;top:0;z-index:5;backdrop-filter:blur(4px)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:54px}
+.course{font-family:var(--sans);font-size:14px;color:var(--ink-soft);font-stretch:90%}
+.course a{color:var(--ink);font-weight:600;text-decoration:none;border-bottom:1px solid var(--rule)}
+.course a:hover{border-bottom-color:var(--ink)}
+.top nav{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--sans);font-size:14px}
+.top nav a{color:var(--ink);text-decoration:none;border-bottom:1px solid transparent}
+.top nav a:hover{border-bottom-color:var(--ink)}
+
+/* type */
+h1,h2,h3{font-family:var(--sans);font-weight:650;line-height:1.1;margin:0}
+h1{font-size:clamp(38px,5.6vw,68px);font-stretch:78%;letter-spacing:-.01em;margin-top:30px}
+h2{font-size:clamp(30px,3.6vw,42px);font-stretch:82%;margin:0 0 18px}
+h2 .sec{color:var(--ink-soft);font-weight:450;margin-right:.35em}
+h3{font-size:24px;font-stretch:88%;margin:36px 0 10px}
+p{margin:0 0 1em}
+.lede{font-size:21px;max-width:60ch;color:var(--ink);margin-top:14px}
+section{padding:64px 0 20px;border-top:1px solid var(--rule)}
+section:first-of-type{border-top:0}
+.note{font-size:15.5px;color:var(--ink-soft);line-height:1.55}
+sub,sup{line-height:0}
+
+/* hero */
+.hero{padding-bottom:30px}
+.hero-eq{width:fit-content;max-width:100%;margin:22px 0 8px;padding:14px 26px;background:var(--sheet);border-left:4px solid var(--ink);overflow-x:auto}
+.hero-eq math{font-size:1.7em}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));max-width:1000px;gap:4px 28px;margin:14px 0 0;font-size:15.5px;line-height:1.45}
+.terms div{display:flex;gap:10px}
+.terms dt{font-family:var(--serif);font-style:italic;min-width:3.8em;font-weight:600;white-space:nowrap}
+.terms dd{margin:0;color:var(--ink-soft)}
+
+/* labs */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:26px;align-items:start;margin:26px 0 30px}
+.lab.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 290px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:2px;padding:14px 14px 8px}
+.sheet canvas{display:block;width:100%;height:360px}
+.hero .sheet canvas{height:440px}
+.sheet .cap{font-family:var(--sans);font-size:14px;color:var(--ink-soft);margin:6px 2px 4px;line-height:1.35}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--sans);font-size:14px;margin:8px 2px 2px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{display:inline-block;width:26px;height:0;border-top:3px solid currentColor}
+.legend i.dash{border-top-style:dashed}
+.controls{font-family:var(--sans);font-size:15px;border-left:1px solid var(--rule);padding-left:20px}
+.ctl{margin:0 0 16px}
+.ctl label,.ctl .lbl{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:4px}
+.ctl output{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--ink);height:26px;margin:0}
+select{font:inherit;padding:4px 6px;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:2px}
+.check{display:flex;gap:8px;align-items:center;font-size:14.5px}
+.check input{accent-color:var(--ink);width:17px;height:17px}
+.readout{margin:18px 0 0;padding-top:12px;border-top:1px solid var(--rule)}
+.readout div{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:14.5px;line-height:1.35}
+.readout dt{color:var(--ink-soft)}
+.readout dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.state{margin-top:10px;font-size:14.5px;padding:8px 10px;background:var(--paper);border-radius:2px}
+.radios{display:flex;flex-direction:column;gap:6px}
+.radios label{display:flex;gap:8px;align-items:center;justify-content:flex-start}
+.radios input{accent-color:var(--cathodic)}
+button{font-family:var(--sans);font-size:15px;font-weight:600;padding:8px 14px;border:1.5px solid var(--ink);background:var(--sheet);color:var(--ink);border-radius:2px;cursor:pointer;margin:0 8px 8px 0}
+button:hover{background:var(--ink);color:var(--sheet)}
+
+.try{background:var(--sheet);border:1px dashed var(--rule);padding:14px 18px;max-width:78ch;font-size:16.5px}
+.try strong{font-family:var(--sans);font-weight:650}
+
+/* worked examples */
+table.data{border-collapse:collapse;font-family:var(--sans);font-size:15.5px;margin:10px 0 18px;font-variant-numeric:tabular-nums}
+table.data th,table.data td{padding:5px 16px;text-align:right;border-bottom:1px solid var(--rule)}
+table.data th{font-weight:600;border-bottom:1.5px solid var(--ink)}
+details{max-width:78ch;margin:10px 0;border-top:1px solid var(--rule);padding:8px 0}
+details summary{cursor:pointer;font-family:var(--sans);font-weight:600;font-size:16.5px}
+details[open] summary{margin-bottom:8px}
+ol.steps{padding-left:1.3em;margin:6px 0}
+ol.steps li{margin-bottom:.55em}
+.qa details summary{font-family:var(--serif);font-weight:500;font-size:18px;line-height:1.5}
+.qa details summary::marker{color:var(--ink-soft)}
+
+footer{border-top:1px solid var(--rule);margin-top:50px;padding:30px 0 60px;font-size:15px;color:var(--ink-soft)}
+footer ol{padding-left:1.2em;max-width:90ch}
+
+@media (max-width:1020px){
+  .lab.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .lab.two .controls{grid-column:1 / -1;border-left:0;padding-left:0;border-top:1px solid var(--rule);padding-top:14px}
+}
+@media (max-width:860px){
+  body{font-size:17px}
+  .lab,.lab.two{grid-template-columns:minmax(0,1fr)}
+  .controls{border-left:0;padding-left:0;border-top:1px solid var(--rule);padding-top:14px}
+  .sheet canvas,.hero .sheet canvas{height:300px}
+  .top nav{display:none}
+  .top{position:static}
+  .hero-eq math{font-size:1.05em}
+  .eq math{font-size:.95em}
+  .eq{padding-left:0}
+  .wrap{padding:0 16px}
+}
+
+
+
+/* ---- additions for this tool ---- */
+.legend span span{display:inline}
+.ctl select{max-width:16rem}
+.ctl label:has(select){flex-direction:column;align-items:stretch;gap:4px}
+.ctl label:has(select) select{max-width:100%;width:100%}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--rule);margin:26px 0 0;flex-wrap:wrap}
+.tabs button{font-family:var(--sans);font-size:15.5px;font-weight:600;font-stretch:92%;
+  background:none;border:0;border-bottom:3px solid transparent;border-radius:0;
+  padding:10px 16px 9px;margin:0 2px -1px 0;color:var(--ink-soft);cursor:pointer}
+.tabs button:hover{color:var(--ink);background:none}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--ink)}
+.tabs button .tnum{color:var(--ink-soft);font-weight:450;margin-right:.45em}
+.tabs button[aria-selected=true] .tnum{color:var(--cathodic)}
+.panel[hidden]{display:none}
+.panel > section:first-of-type{border-top:0;padding-top:34px}
+.params{position:sticky;top:0;z-index:4;background:var(--sheet);border:1px solid var(--rule);
+  border-radius:2px;padding:12px 18px;margin:20px 0 10px;font-family:var(--sans);font-size:14.5px}
+.params .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:4px 26px}
+.params .ctl{margin:0 0 6px}
+.params h4{margin:0 0 8px;font-family:var(--sans);font-size:13.5px;font-weight:650;
+  color:var(--ink-soft);font-stretch:90%}
+.lab.tri{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lab.tri .sheet canvas{height:304px}
+.lab.tri .controls{grid-column:1 / -1;border-left:0;border-top:1px solid var(--rule);
+  padding-left:0;padding-top:14px}
+.lab.tri .controls .row,.lab .controls .row{display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px 26px}
+.circuitbox{background:var(--sheet);border:1px solid var(--rule);border-radius:2px;
+  padding:10px 12px 6px;margin:0 0 14px;text-align:center}
+.circuitbox svg{max-width:100%;height:auto}
+.circuitbox .cap{font-family:var(--sans);font-size:13.5px;color:var(--ink-soft);margin:2px 0 4px}
+textarea{width:100%;height:110px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;
+  border:1px solid var(--rule);background:var(--sheet);color:var(--ink);padding:8px;border-radius:2px}
+ul.plain{max-width:78ch;padding-left:1.2em}
+ul.plain li{margin-bottom:.45em}
+.cdc{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.94em;
+  background:var(--sheet);border:1px solid var(--rule);padding:1px 6px;border-radius:2px}
+table.data td.l,table.data th.l{text-align:left}
+.keyline{font-family:var(--sans);font-size:14.5px;color:var(--ink-soft);margin:10px 0 0}
+.srcnote{font-size:14.5px;color:var(--ink-soft);border-left:3px solid var(--rule);
+  padding:2px 0 2px 14px;margin:14px 0;max-width:76ch;line-height:1.5}
+@media (max-width:1100px){.lab.tri{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:860px){
+  .params{position:static}
+  .lab.tri{grid-template-columns:minmax(0,1fr)}
+  .tabs button{font-size:14px;padding:9px 10px 8px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <span class="course"><a href="https://www.linkedin.com/in/sergio-blanco-professor/" target="_blank" rel="noopener">Sergio Blanco, PhD</a>&ensp;Electrochemistry 101</span>
+    <nav aria-label="Sections"><a href="#tabbar">Contents</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<h1 style="margin-top:30px">Electrochemical impedance spectroscopy</h1>
+<p class="lede">Perturb a system with a small sinusoid, measure the response, and divide. Repeat at a hundred frequencies and the quotient becomes a map of everything happening at the interface, sorted by how fast it happens. This tool builds that idea from the phasor up.</p>
+
+<div class="tabs" id="tabbar" role="tablist" aria-label="Sections of this tool">
+  <button role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true"><span class="tnum">1</span>Basic principles</button>
+  <button role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false"><span class="tnum">2</span>Impedance of a circuit</button>
+  <button role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false"><span class="tnum">3</span>EIS and the Randles circuit</button>
+  <button role="tab" id="tab-4" aria-controls="panel-4" aria-selected="false"><span class="tnum">4</span>Complex systems</button>
+</div>
+
+<!-- ============================ TAB 1 ============================ -->
+<div class="panel" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+
+<section aria-labelledby="t11">
+  <h2 id="t11"><span class="sec">1.1</span>A sinusoid is the shadow of a rotating vector</h2>
+  <div class="prose">
+    <p>Take a vector of length <i>X</i><sub>o</sub> turning anticlockwise at a constant angular frequency ω. Project it onto the vertical axis and you get a sinusoid. One full turn, ωt = 2π, draws one complete cycle.</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>X</mi><mi>o</mi></msub><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>ω</mi><mo>=</mo><mn>2</mn><mi>π</mi><mi>f</mi><mo separator="true">,</mo><mspace width="2em"/><mi>T</mi><mo>=</mo><mfrac><mn>1</mn><mi>f</mi></mfrac></mrow><annotation encoding="application/x-tex">x(t) = X_o\sin(\omega t), \qquad \omega = 2\pi f, \qquad T = \frac{1}{f}</annotation></semantics></math></span></div>
+    <p>Three amplitudes name the same wave and are a standing source of confusion when reading a methods section. The peak <i>X</i><sub>o</sub> = <i>X</i><sub>p</sub> is what the equations above use; the peak-to-peak value is twice it; the root-mean-square value is what a multimeter reports.</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>X</mi><mrow><mi>p</mi><mi>p</mi></mrow></msub><mo>=</mo><mn>2</mn><msub><mi>X</mi><mi>o</mi></msub><mo separator="true">,</mo><mspace width="2em"/><msub><mi>X</mi><mrow><mi>r</mi><mi>m</mi><mi>s</mi></mrow></msub><mo>=</mo><mfrac><msub><mi>X</mi><mi>o</mi></msub><msqrt><mn>2</mn></msqrt></mfrac><mo>=</mo><mn>0.707</mn><mtext> </mtext><msub><mi>X</mi><mi>o</mi></msub></mrow><annotation encoding="application/x-tex">X_{pp} = 2X_o, \qquad X_{rms} = \frac{X_o}{\sqrt{2}} = 0.707\,X_o</annotation></semantics></math></span></div>
+  </div>
+</section>
+
+<section aria-labelledby="t12">
+  <h2 id="t12"><span class="sec">1.2</span>Two signals, one frequency, one phase angle</h2>
+  <div class="prose">
+    <p>Apply a sinusoidal potential to a cell and the current that comes back is a sinusoid of <em>the same frequency</em>, differing only in amplitude and in phase. Freeze both rotating vectors at one instant and you have two phasors: arrows whose length is the amplitude and whose angle between them is the phase shift φ.</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>E</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">Δ</mi><mi>E</mi><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo stretchy="false">)</mo><mspace width="2em"/><mo>⟶</mo><mspace width="2em"/><mi>i</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">Δ</mi><mi>i</mi><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo>−</mo><mi>φ</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">E(t) = \Delta E\sin(\omega t) \qquad\longrightarrow\qquad i(t) = \Delta i\sin(\omega t - \varphi)</annotation></semantics></math></span></div>
+    <p>The sign needs care. φ in that equation is the phase of the <em>impedance</em>, and it enters the current with a minus sign. So a negative φ, which is what every capacitive electrode gives, means the current reaches its maximum <em>earlier</em> than the potential: the current leads. Through a pure resistor φ = 0 and the two are in phase. The panels below are the same instant seen three ways; drag the phase and watch them move together.</p>
+  </div>
+
+  <div class="params" id="p1-params">
+    <h4>One sinusoidal experiment</h4>
+    <div class="row">
+      <div class="ctl"><label for="a-f"><span>Frequency, f</span><output id="o-a-f"></output></label>
+        <input type="range" id="a-f" min="-2" max="5" step="0.05" value="2"></div>
+      <div class="ctl"><label for="a-amp"><span>Potential amplitude, ΔE</span><output id="o-a-amp"></output></label>
+        <input type="range" id="a-amp" min="1" max="50" step="1" value="10"></div>
+      <div class="ctl"><label for="a-z"><span>Impedance modulus, |Z|</span><output id="o-a-z"></output></label>
+        <input type="range" id="a-z" min="1" max="5" step="0.05" value="3"></div>
+      <div class="ctl"><label for="a-phi"><span>Phase of Z, φ</span><output id="o-a-phi"></output></label>
+        <input type="range" id="a-phi" min="-90" max="90" step="1" value="-45" style="accent-color:var(--cathodic)"></div>
+      <div class="ctl" style="display:flex;align-items:flex-end">
+        <label class="check"><input type="checkbox" id="a-run" checked> Animate the rotation</label></div>
+    </div>
+  </div>
+
+  <div class="lab tri">
+    <div class="sheet">
+      <canvas id="c-rot" role="img" aria-label="Two vectors rotating on a trigonometric circle, one for potential and one for current"></canvas>
+      <div class="legend">
+        <span style="color:var(--cathodic)"><i></i><span>potential phasor</span></span>
+        <span style="color:var(--anodic)"><i></i><span>current phasor</span></span>
+      </div>
+      <p class="cap">Both vectors turn at the same ω. The angle between them is fixed: that angle is the phase of the impedance.</p>
+    </div>
+    <div class="sheet">
+      <canvas id="c-sig" role="img" aria-label="Potential and current sinusoids against time, showing the phase shift"></canvas>
+      <div class="legend">
+        <span style="color:var(--cathodic)"><i></i><span>E(t)</span></span>
+        <span style="color:var(--anodic)"><i></i><span>i(t)</span></span>
+      </div>
+      <p class="cap">Each trace is the vertical projection of its own vector. Both normalized to their own amplitude so the shift is visible.</p>
+    </div>
+    <div class="sheet">
+      <canvas id="c-lis" role="img" aria-label="Current against potential over one cycle, forming a Lissajous ellipse"></canvas>
+      <p class="cap">The Lissajous figure, i against E over one cycle. A straight line means a pure resistor, a circle a pure capacitor, an ellipse anything between. In the laboratory a distorted or drifting ellipse is the signal that your amplitude is too large.</p>
+    </div>
+    <div class="controls">
+      <div class="row">
+        <dl class="readout" style="border:0;margin:0;padding:0">
+          <div><dt>Angular frequency, ω</dt><dd id="r-a-w"></dd></div>
+          <div><dt>Period, T</dt><dd id="r-a-T"></dd></div>
+          <div><dt>ΔE peak-to-peak</dt><dd id="r-a-pp"></dd></div>
+          <div><dt>ΔE rms</dt><dd id="r-a-rms"></dd></div>
+        </dl>
+        <dl class="readout" style="border:0;margin:0;padding:0">
+          <div><dt>Current amplitude, Δi</dt><dd id="r-a-di"></dd></div>
+          <div><dt>Real part, Z′ = |Z| cos φ</dt><dd id="r-a-zr"></dd></div>
+          <div><dt>Imaginary part, Z″ = |Z| sin φ</dt><dd id="r-a-zi"></dd></div>
+          <div><dt>Behaviour</dt><dd id="r-a-kind"></dd></div>
+        </dl>
+      </div>
+      <p class="state" id="r-a-state"></p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t13">
+  <h2 id="t13"><span class="sec">1.3</span>Why complex numbers make this easy</h2>
+  <div class="prose">
+    <p>Carrying amplitudes and phase angles through a circuit by trigonometry is painful. Writing each phasor as a complex number turns the whole problem into arithmetic. A complex number has a rectangular form and a polar form, and Euler's relation connects them:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>z</mi><mo>=</mo><mi>a</mi><mo>+</mo><mi>j</mi><mi>b</mi><mo>=</mo><mi mathvariant="normal">∣</mi><mi>z</mi><mi mathvariant="normal">∣</mi><mrow><mo fence="true">(</mo><mi>cos</mi><mo>⁡</mo><mi>φ</mi><mo>+</mo><mi>j</mi><mi>sin</mi><mo>⁡</mo><mi>φ</mi><mo fence="true">)</mo></mrow><mo>=</mo><mi mathvariant="normal">∣</mi><mi>z</mi><mi mathvariant="normal">∣</mi><mtext> </mtext><msup><mi>e</mi><mrow><mi>j</mi><mi>φ</mi></mrow></msup><mo separator="true">,</mo><mspace width="2em"/><msup><mi>j</mi><mn>2</mn></msup><mo>=</mo><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">z = a + jb = |z|\left(\cos\varphi + j\sin\varphi\right) = |z|\,e^{j\varphi}, \qquad j^2 = -1</annotation></semantics></math></span></div>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∣</mi><mi>z</mi><mi mathvariant="normal">∣</mi><mo>=</mo><msqrt><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup></mrow></msqrt><mo separator="true">,</mo><mspace width="2em"/><mi>φ</mi><mo>=</mo><mi>arctan</mi><mo>⁡</mo><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mfrac><mi>b</mi><mi>a</mi></mfrac><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">|z| = \sqrt{a^2+b^2}, \qquad \varphi = \arctan\!\left(\frac{b}{a}\right)</annotation></semantics></math></span></div>
+    <p>Electrochemists write <i>j</i> rather than <i>i</i> for the imaginary unit, because <i>i</i> is already the current. A sinusoid in the time domain becomes a single complex number in the frequency domain, and the common factor <i>e</i><sup><i>jωt</i></sup> cancels when you take a ratio:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>X</mi><mi>o</mi></msub><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>ω</mi><mi>t</mi><mo>+</mo><mi>φ</mi><mo stretchy="false">)</mo><mspace width="2em"/><mo>⟷</mo><mspace width="2em"/><mover accent="true"><mi>X</mi><mo>~</mo></mover><mo>=</mo><msub><mi>X</mi><mi>o</mi></msub><msup><mi>e</mi><mrow><mtext> </mtext><mi>j</mi><mi>φ</mi></mrow></msup></mrow><annotation encoding="application/x-tex">x(t) = X_o\cos(\omega t + \varphi) \qquad\longleftrightarrow\qquad \tilde{X} = X_o e^{\,j\varphi}</annotation></semantics></math></span></div>
+  </div>
+</section>
+
+<section aria-labelledby="t14">
+  <h2 id="t14"><span class="sec">1.4</span>Impedance is a transfer function</h2>
+  <div class="prose">
+    <p>Any system that is linear and time-invariant, and that you interrogate with an input <i>x</i>(<i>t</i>), returns an output <i>y</i>(<i>t</i>) at the same frequency. The ratio of the two phasors is the transfer function, and when the input is potential and the output current, that transfer function is the impedance:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>Z</mi><mo stretchy="false">(</mo><mi>ω</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mover accent="true"><mi>E</mi><mo>~</mo></mover><mover accent="true"><mi>I</mi><mo>~</mo></mover></mfrac><mo>=</mo><mi mathvariant="normal">∣</mi><mi>Z</mi><mi mathvariant="normal">∣</mi><mtext> </mtext><msup><mi>e</mi><mrow><mtext> </mtext><mi>j</mi><mi>φ</mi></mrow></msup><mo>=</mo><msup><mi>Z</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>+</mo><mi>j</mi><msup><mi>Z</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup></mrow><annotation encoding="application/x-tex">Z(\omega) = \frac{\tilde{E}}{\tilde{I}} = |Z|\,e^{\,j\varphi} = Z&#x27; + jZ&#x27;&#x27;</annotation></semantics></math></span></div>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msup><mi>Z</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo>=</mo><mi mathvariant="normal">∣</mi><mi>Z</mi><mi mathvariant="normal">∣</mi><mi>cos</mi><mo>⁡</mo><mi>φ</mi><mo separator="true">,</mo><mspace width="2em"/><msup><mi>Z</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup><mo>=</mo><mi mathvariant="normal">∣</mi><mi>Z</mi><mi mathvariant="normal">∣</mi><mi>sin</mi><mo>⁡</mo><mi>φ</mi><mo separator="true">,</mo><mspace width="2em"/><mi mathvariant="normal">∣</mi><mi>Z</mi><mi mathvariant="normal">∣</mi><mo>=</mo><msqrt><mrow><mo stretchy="false">(</mo><msup><mi>Z</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mo stretchy="false">(</mo><msup><mi>Z</mi><mrow><mo mathvariant="normal">′</mo><mo mathvariant="normal">′</mo></mrow></msup><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">Z&#x27; = |Z|\cos\varphi, \qquad Z&#x27;&#x27; = |Z|\sin\varphi, \qquad |Z| = \sqrt{(Z&#x27;)^2 + (Z&#x27;&#x27;)^2}</annotation></semantics></math></span></div>
+    <p>Notice what the ratio has thrown away: the time, and the size of the perturbation. One frequency yields one complex number, that is, one point on a Nyquist plot. Sweeping the frequency traces the whole curve, and that is all an impedance spectrum is.</p>
+    <p>The word <em>linear</em> in that definition is a condition you have to arrange. The current–potential curve of an electrode is exponential, so only a small piece of it is locally straight. At 25 °C a 10 mV amplitude keeps the response linear to about one percent; 50 mV does not, the response acquires harmonics, and <i>Z</i> stops being well defined. The system must also be stationary, since the spectrum takes minutes to hours to record.</p>
+    <div class="try"><strong>Three conditions, worth memorising.</strong> <em>Linearity:</em> the perturbation is small enough that the response is proportional to it. <em>Causality:</em> the response is produced only by your perturbation, not by something else in the room. <em>Stability:</em> the system is the same at the end of the sweep as at the start. The Kramers–Kronig test in §4.6 is the formal way to check that all three held.</div>
+  </div>
+  <div class="srcnote">The treatment in this tab follows Lazanas and Prodromidis, <i>Electrochemical Impedance Spectroscopy: A Tutorial</i>, <i>ACS Meas. Sci. Au</i> 3 (2023) 162, sections 2 to 4, and Bard &amp; Faulkner, 2nd ed., section 10.1.2.</div>
+</section>
+</div>
+
+<!-- ============================ TAB 2 ============================ -->
+<div class="panel" id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
+
+<section aria-labelledby="t21">
+  <h2 id="t21"><span class="sec">2.1</span>Three building blocks</h2>
+  <div class="prose">
+    <p>Before any electrochemistry, learn to read the spectrum of a circuit made of ordinary components. Three passive elements cover almost everything.</p>
+  </div>
+  <table class="data" aria-label="Impedance of the three passive elements">
+    <thead><tr><th class="l" scope="col">Element</th><th class="l" scope="col">Impedance</th><th scope="col">Z′</th><th scope="col">Z″</th><th scope="col">Phase</th><th class="l" scope="col">What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="l">Resistor <i>R</i></td><td class="l">Z = R</td><td>R</td><td>0</td><td>0°</td><td class="l">opposes current, no delay, frequency-independent</td></tr>
+      <tr><td class="l">Capacitor <i>C</i></td><td class="l">Z = 1 / jωC</td><td>0</td><td>−1/ωC</td><td>−90°</td><td class="l">stores charge; a short circuit when fast, an open circuit when slow</td></tr>
+      <tr><td class="l">Inductor <i>L</i></td><td class="l">Z = jωL</td><td>0</td><td>+ωL</td><td>+90°</td><td class="l">opposes change of current; in EIS usually a cable artifact</td></tr>
+    </tbody>
+  </table>
+  <div class="prose">
+    <p>The sign convention matters and trips people up. For a capacitor <i>Z</i>″ is negative, and Nyquist plots are drawn as −<i>Z</i>″ against <i>Z</i>′ so that capacitive behaviour appears in the upper half-plane. Inductive behaviour then appears below the axis.</p>
+    <p>Combining elements follows Kirchhoff's rules, with complex arithmetic doing the work of the trigonometry:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>series: </mtext><msub><mi>Z</mi><mrow><mi>e</mi><mi>q</mi></mrow></msub><mo>=</mo><msub><mi>Z</mi><mn>1</mn></msub><mo>+</mo><msub><mi>Z</mi><mn>2</mn></msub><mo>+</mo><mo>⋯</mo><mspace width="2em"/><mspace width="2em"/><mtext>parallel: </mtext><mfrac><mn>1</mn><msub><mi>Z</mi><mrow><mi>e</mi><mi>q</mi></mrow></msub></mfrac><mo>=</mo><mfrac><mn>1</mn><msub><mi>Z</mi><mn>1</mn></msub></mfrac><mo>+</mo><mfrac><mn>1</mn><msub><mi>Z</mi><mn>2</mn></msub></mfrac><mo>+</mo><mo>⋯</mo></mrow><annotation encoding="application/x-tex">\text{series: } Z_{eq} = Z_1 + Z_2 + \cdots \qquad\qquad \text{parallel: } \frac{1}{Z_{eq}} = \frac{1}{Z_1} + \frac{1}{Z_2} + \cdots</annotation></semantics></math></span></div>
+    <p>In parallel it is often easier to add admittances, <i>Y</i> = 1/<i>Z</i>, which simply sum. Circuits are named with Boukamp's description code: elements in series are written next to each other and a parallel combination is enclosed in parentheses, so <span class="cdc">R(RC)</span> is a resistor in series with a parallel resistor–capacitor pair.</p>
+  </div>
+</section>
+
+<section aria-labelledby="t22">
+  <h2 id="t22"><span class="sec">2.2</span>The model-circuit explorer</h2>
+  <div class="prose">
+    <p>Pick a circuit and read it in all three representations at once. The marker on each panel is the same frequency, so you can follow one point as it travels. Start with the single resistor and work down the list: every electrochemical spectrum in tab 3 is built from these.</p>
+  </div>
+
+  <div class="params" id="p2-params">
+    <h4>Circuit and components</h4>
+    <div class="row">
+      <div class="ctl"><label for="b-circ"><span>Circuit</span>
+        <select id="b-circ">
+          <option value="R">R — a resistor alone</option>
+          <option value="C">C — a capacitor alone</option>
+          <option value="L">L — an inductor alone</option>
+          <option value="RC">RC — in series</option>
+          <option value="pRC">(RC) — in parallel</option>
+          <option value="RpRC" selected>R(RC) — the workhorse</option>
+          <option value="RpRCpRC">R(RC)(RC) — two time constants</option>
+        </select></label></div>
+      <div class="ctl"><label for="b-r0"><span>R₀ series resistance</span><output id="o-b-r0"></output></label>
+        <input type="range" id="b-r0" min="0" max="4" step="0.05" value="2"></div>
+      <div class="ctl"><label for="b-r1"><span>R₁</span><output id="o-b-r1"></output></label>
+        <input type="range" id="b-r1" min="1" max="6" step="0.05" value="3"></div>
+      <div class="ctl"><label for="b-c1"><span>C₁</span><output id="o-b-c1"></output></label>
+        <input type="range" id="b-c1" min="-9" max="-3" step="0.05" value="-6"></div>
+      <div class="ctl"><label for="b-r2"><span>R₂ (second loop)</span><output id="o-b-r2"></output></label>
+        <input type="range" id="b-r2" min="1" max="6" step="0.05" value="4"></div>
+      <div class="ctl"><label for="b-c2"><span>C₂ (second loop)</span><output id="o-b-c2"></output></label>
+        <input type="range" id="b-c2" min="-9" max="-3" step="0.05" value="-4"></div>
+      <div class="ctl"><label for="b-l"><span>L</span><output id="o-b-l"></output></label>
+        <input type="range" id="b-l" min="-7" max="-2" step="0.05" value="-4"></div>
+      <div class="ctl"><label for="b-f"><span>Frequency cursor</span><output id="o-b-f"></output></label>
+        <input type="range" id="b-f" min="-2" max="6" step="0.02" value="2" style="accent-color:var(--cathodic)"></div>
+    </div>
+  </div>
+
+  <div class="circuitbox"><div id="b-diagram"></div><p class="cap" id="b-cdc"></p></div>
+
+  <div class="lab tri">
+    <div class="sheet"><canvas id="c-b-nyq" role="img" aria-label="Nyquist plot of the selected circuit"></canvas>
+      <p class="cap">Nyquist, −Z″ against Z′, drawn with both axes on the same scale so a semicircle looks like one. Frequency increases toward the left and is nowhere written on the axis, which is this plot's weakness.</p></div>
+    <div class="sheet"><canvas id="c-b-mag" role="img" aria-label="Bode magnitude plot of the selected circuit"></canvas>
+      <p class="cap">Bode magnitude. Plateaus are resistances; a slope of −1 is an ideal capacitor; breakpoints mark time constants.</p></div>
+    <div class="sheet"><canvas id="c-b-pha" role="img" aria-label="Bode phase plot of the selected circuit"></canvas>
+      <p class="cap">Bode phase. 0° is purely resistive, −90° purely capacitive, +90° inductive. Each peak is one time constant.</p></div>
+    <div class="controls">
+      <div class="row">
+        <dl class="readout" style="border:0;margin:0;padding:0">
+          <div><dt>At the cursor, |Z|</dt><dd id="r-b-mod"></dd></div>
+          <div><dt>Phase of Z, φ</dt><dd id="r-b-phi"></dd></div>
+          <div><dt>Z′</dt><dd id="r-b-zr"></dd></div>
+          <div><dt>−Z″</dt><dd id="r-b-zi"></dd></div>
+        </dl>
+        <dl class="readout" style="border:0;margin:0;padding:0">
+          <div><dt>High-frequency limit</dt><dd id="r-b-hf"></dd></div>
+          <div><dt>Low-frequency limit</dt><dd id="r-b-lf"></dd></div>
+          <div><dt>Time constant(s), τ = RC</dt><dd id="r-b-tau"></dd></div>
+          <div><dt>Characteristic frequency</dt><dd id="r-b-fc"></dd></div>
+        </dl>
+      </div>
+      <p class="state" id="r-b-state"></p>
+    </div>
+  </div>
+
+  <div class="try"><strong>Work through these in order.</strong> <em>R alone:</em> one point on the real axis, a flat magnitude, zero phase at every frequency. <em>C alone:</em> a vertical line up the imaginary axis, magnitude with slope −1, phase pinned at −90°. <em>RC in series:</em> the two stacked, with the vertical line displaced to Z′ = R. <em>(RC) in parallel:</em> a semicircle, because at high frequency the capacitor shorts the resistor out and at low frequency it blocks. <em>R(RC):</em> the same semicircle slid along the real axis by R₀, which is the shape almost every electrochemical cell produces.</div>
+</section>
+
+<section aria-labelledby="t23">
+  <h2 id="t23"><span class="sec">2.3</span>Reading the semicircle</h2>
+  <div class="prose">
+    <p>The <span class="cdc">R(RC)</span> circuit is worth knowing by heart, because tab 3 is mostly this circuit with physical names attached. Its impedance separates into</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>Z</mi><mo stretchy="false">(</mo><mi>ω</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>R</mi><mn>0</mn></msub><mo>+</mo><mfrac><msub><mi>R</mi><mn>1</mn></msub><mrow><mn>1</mn><mo>+</mo><mo stretchy="false">(</mo><mi>ω</mi><msub><mi>R</mi><mn>1</mn></msub><msub><mi>C</mi><mn>1</mn></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mo>−</mo><mi>j</mi><mtext> </mtext><mfrac><mrow><mi>ω</mi><msubsup><mi>R</mi><mn>1</mn><mn>2</mn></msubsup><msub><mi>C</mi><mn>1</mn></msub></mrow><mrow><mn>1</mn><mo>+</mo><mo stretchy="false">(</mo><mi>ω</mi><msub><mi>R</mi><mn>1</mn></msub><msub><mi>C</mi><mn>1</mn></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">Z(\omega) = R_0 + \frac{R_1}{1+(\omega R_1C_1)^2} - j\,\frac{\omega R_1^2C_1}{1+(\omega R_1C_1)^2}</annotation></semantics></math></span></div>
+    <p>At high frequency the capacitor is a short circuit, so <i>Z</i> → <i>R</i><sub>0</sub>: the left-hand intercept. At low frequency it is an open circuit and all the current goes through <i>R</i><sub>1</sub>, so <i>Z</i> → <i>R</i><sub>0</sub> + <i>R</i><sub>1</sub>: the right-hand intercept. The diameter of the semicircle is therefore <i>R</i><sub>1</sub>, read off the real axis without any fitting.</p>
+    <p>Between the two, the imaginary part passes through a maximum exactly where the capacitive reactance equals the resistance. That frequency gives the time constant directly:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>ω</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>R</mi><mn>1</mn></msub><msub><mi>C</mi><mn>1</mn></msub></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mi>τ</mi></mfrac><mo separator="true">,</mo><mspace width="2em"/><msub><mi>f</mi><mi>c</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>π</mi><msub><mi>R</mi><mn>1</mn></msub><msub><mi>C</mi><mn>1</mn></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\omega_{max} = \frac{1}{R_1C_1} = \frac{1}{\tau}, \qquad f_c = \frac{1}{2\pi R_1 C_1}</annotation></semantics></math></span></div>
+    <p>So a single semicircle hands you three numbers by inspection: <i>R</i><sub>0</sub> from the left intercept, <i>R</i><sub>1</sub> from the width, and <i>C</i><sub>1</sub> from the frequency at the apex. Fitting refines them; it should not be what discovers them.</p>
+  </div>
+</section>
+
+<section aria-labelledby="t24">
+  <h2 id="t24"><span class="sec">2.4</span>Why you must look at both plots</h2>
+  <div class="prose">
+    <p>The Nyquist plot shows the shape of the response but hides the frequency, and because both axes share a scale the high-frequency end is often squeezed into a corner a few pixels wide. The Bode plots show the frequency explicitly and spread the whole range evenly, but make the shape harder to see.</p>
+    <p>Switch the explorer above to <span class="cdc">R(RC)(RC)</span> and separate the two time constants by three decades: the Bode phase plot shows two clean peaks while the Nyquist plot shows two overlapping arcs you would struggle to count. Bring the time constants within a factor of ten of each other and both plots show a single feature, which is the honest answer: two processes that fast cannot be resolved by this measurement.</p>
+    <p class="keyline">Rule of thumb from the tutorial literature: two semicircles are well resolved when their time constants differ by a factor of about 100, and merge into one when they are equal.</p>
+  </div>
+</section>
+
+<section aria-labelledby="t25">
+  <h2 id="t25"><span class="sec">2.5</span>The same spectrum from different circuits</h2>
+  <div class="prose">
+    <p>An equivalent circuit is a hypothesis, not a measurement. Different arrangements of elements can be mathematically identical, producing spectra that cannot be told apart at any frequency. The circuit <span class="cdc">R₁(C₁R₂)(C₂R₃)</span> and a suitably chosen nested arrangement are a classic example.</p>
+    <p>Two consequences for practice. A good fit is necessary but never sufficient evidence that your circuit is right; and the choice between two circuits that fit equally well has to be made on physical grounds, from what you know is happening at the interface, not from χ². Keep the circuit as simple as the data allow and justify every element by a process you can name.</p>
+  </div>
+  <div class="srcnote">Circuit responses and the description code follow Lazanas and Prodromidis, sections 5 to 8, Figures 7 to 9.</div>
+</section>
+</div>
+
+<!-- ============================ TAB 3 ============================ -->
+<div class="panel" id="panel-3" role="tabpanel" aria-labelledby="tab-3" hidden>
+
+<section aria-labelledby="t31">
+  <h2 id="t31"><span class="sec">3.1</span>From a cell to a circuit</h2>
+  <div class="prose">
+    <p>Nothing inside an electrochemical cell is a resistor or a capacitor. The equivalent circuit is a statement that, as far as a small sinusoid can tell, the cell responds <em>as if</em> it were made of these elements. Each one stands for a physical process, and the mapping is what makes the method chemistry rather than electronics.</p>
+  </div>
+  <table class="data" aria-label="Circuit elements and the processes they represent">
+    <thead><tr><th class="l" scope="col">Element</th><th class="l" scope="col">Physical process</th><th class="l" scope="col">Where it shows up</th></tr></thead>
+    <tbody>
+      <tr><td class="l">R<sub>u</sub></td><td class="l">ionic conduction through the electrolyte between working and reference electrode</td><td class="l">high-frequency intercept</td></tr>
+      <tr><td class="l">C<sub>dl</sub></td><td class="l">charging and discharging of the electrical double layer</td><td class="l">sets the frequency of the arc apex</td></tr>
+      <tr><td class="l">R<sub>ct</sub></td><td class="l">kinetics of the electron-transfer step</td><td class="l">diameter of the arc</td></tr>
+      <tr><td class="l">Z<sub>W</sub></td><td class="l">diffusion of the redox species to the surface</td><td class="l">45° tail at low frequency</td></tr>
+      <tr><td class="l">C<sub>c</sub>, R<sub>pore</sub></td><td class="l">capacitance of a film and ionic resistance of the paths through it</td><td class="l">second, higher-frequency arc</td></tr>
+      <tr><td class="l">CPE</td><td class="l">a distribution of time constants across a non-uniform surface</td><td class="l">depressed, flattened arc</td></tr>
+    </tbody>
+  </table>
+  <div class="prose">
+    <p>The total current through the interface splits in two, and that split is what the parallel branch in every one of these circuits expresses:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>i</mi><mrow><mi>t</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>=</mo><msub><mi>i</mi><mi>C</mi></msub><mo>+</mo><msub><mi>i</mi><mi>F</mi></msub></mrow><annotation encoding="application/x-tex">i_{total} = i_C + i_F</annotation></semantics></math></span></div>
+    <p>One part charges the double layer, the other crosses the interface as a faradaic reaction. All of it must travel through the electrolyte, which is why <i>R</i><sub>u</sub> sits in series with everything else.</p>
+  </div>
+</section>
+
+<section aria-labelledby="t32">
+  <h2 id="t32"><span class="sec">3.2</span>The Randles circuit</h2>
+  <div class="prose">
+    <p>Represent the faradaic branch by a general impedance <i>Z</i><sub>F</sub> and you have the circuit Bard and Faulkner call the Randles equivalent circuit. <i>Z</i><sub>F</sub> itself splits into a kinetic part and a transport part:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>Z</mi><mi>F</mi></msub><mo>=</mo><msub><mi>R</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>Z</mi><mi>W</mi></msub></mrow><annotation encoding="application/x-tex">Z_F = R_{ct} + Z_W</annotation></semantics></math></span></div>
+    <p>The charge-transfer resistance follows from linearising the Butler–Volmer equation about the equilibrium potential, which makes it the impedance route to the same exchange current density a Tafel plot gives:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>R</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub><mo>=</mo><mfrac><mrow><mi>R</mi><mi>T</mi></mrow><mrow><mi>n</mi><mi>F</mi><mtext> </mtext><msub><mi>i</mi><mn>0</mn></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>R</mi><mi>T</mi></mrow><mrow><msup><mi>n</mi><mn>2</mn></msup><msup><mi>F</mi><mn>2</mn></msup><mi>A</mi><msup><mi>k</mi><mn>0</mn></msup><mi>C</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">R_{ct} = \frac{RT}{nF\,i_0} = \frac{RT}{n^2F^2Ak^0C}</annotation></semantics></math></span></div>
+    <p>The Warburg impedance describes semi-infinite linear diffusion. Its real and imaginary parts are equal and both fall as ω<sup>−1/2</sup>, which is what produces a line at exactly 45°:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>Z</mi><mi>W</mi></msub><mo>=</mo><mi>σ</mi><mtext> </mtext><msup><mi>ω</mi><mrow><mo>−</mo><mn>1</mn><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msup><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>j</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><mi>σ</mi><mo>=</mo><mfrac><mrow><mi>R</mi><mi>T</mi></mrow><mrow><msup><mi>n</mi><mn>2</mn></msup><msup><mi>F</mi><mn>2</mn></msup><mi>A</mi><msqrt><mn>2</mn></msqrt></mrow></mfrac><mrow><mo fence="true">(</mo><mfrac><mn>1</mn><mrow><msqrt><msub><mi>D</mi><mi>O</mi></msub></msqrt><mtext> </mtext><msubsup><mi>C</mi><mi>O</mi><mo lspace="0em" rspace="0em">∗</mo></msubsup></mrow></mfrac><mo>+</mo><mfrac><mn>1</mn><mrow><msqrt><msub><mi>D</mi><mi>R</mi></msub></msqrt><mtext> </mtext><msubsup><mi>C</mi><mi>R</mi><mo lspace="0em" rspace="0em">∗</mo></msubsup></mrow></mfrac><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">Z_W = \sigma\,\omega^{-1/2}(1-j), \qquad \sigma = \frac{RT}{n^2F^2A\sqrt{2}}\left(\frac{1}{\sqrt{D_O}\,C_O^{*}} + \frac{1}{\sqrt{D_R}\,C_R^{*}}\right)</annotation></semantics></math></span></div>
+    <p>Reading that σ backwards is how an impedance spectrum delivers a diffusion coefficient. Note what it contains: concentration and area as well as <i>D</i>, so the same cautions about electrode area apply here as anywhere else.</p>
+  </div>
+</section>
+
+<section aria-labelledby="t33">
+  <h2 id="t33"><span class="sec">3.3</span>Five electrodes, five spectra</h2>
+  <div class="prose">
+    <p>Choose a system below and watch its circuit and its spectrum change together. The sliders are physical where they can be: setting <i>k</i><sup>0</sup> computes <i>R</i><sub>ct</sub> for you, and setting <i>D</i> and the concentration computes σ.</p>
+  </div>
+
+  <div class="params" id="p3-params">
+    <h4>The electrode</h4>
+    <div class="row">
+      <div class="ctl"><label for="c-sys"><span>System</span>
+        <select id="c-sys">
+          <option value="blocking">Blocking electrode, no redox couple</option>
+          <option value="kinetic" selected>Bare electrode, kinetic control</option>
+          <option value="randles">Bare electrode with diffusion (Randles)</option>
+          <option value="coated">Coated electrode, intact film</option>
+          <option value="coatedW">Coated electrode with diffusion</option>
+        </select></label></div>
+      <div class="ctl"><label for="c-ru"><span>R<sub>u</sub> electrolyte</span><output id="o-c-ru"></output></label>
+        <input type="range" id="c-ru" min="0" max="4" step="0.05" value="2"></div>
+      <div class="ctl"><label for="c-k0"><span>Rate constant, k⁰</span><output id="o-c-k0"></output></label>
+        <input type="range" id="c-k0" min="-7" max="-1" step="0.05" value="-4"></div>
+      <div class="ctl"><label for="c-cdl"><span>C<sub>dl</sub></span><output id="o-c-cdl"></output></label>
+        <input type="range" id="c-cdl" min="1" max="200" step="1" value="30"></div>
+      <div class="ctl"><label for="c-conc"><span>Redox concentration, C*</span><output id="o-c-conc"></output></label>
+        <input type="range" id="c-conc" min="0.1" max="20" step="0.1" value="5"></div>
+      <div class="ctl"><label for="c-D"><span>Diffusion coefficient, D</span><output id="o-c-D"></output></label>
+        <input type="range" id="c-D" min="-7" max="-4" step="0.05" value="-5.1"></div>
+      <div class="ctl"><label for="c-n"><span>CPE exponent, n</span><output id="o-c-n"></output></label>
+        <input type="range" id="c-n" min="0.5" max="1" step="0.01" value="1"></div>
+      <div class="ctl"><label for="c-rpore"><span>R<sub>pore</sub> film</span><output id="o-c-rpore"></output></label>
+        <input type="range" id="c-rpore" min="2" max="9" step="0.05" value="5"></div>
+      <div class="ctl"><label for="c-cc"><span>C<sub>c</sub> coating</span><output id="o-c-cc"></output></label>
+        <input type="range" id="c-cc" min="-11" max="-7" step="0.05" value="-9.5"></div>
+      <div class="ctl"><label for="c-expo"><span>Bare metal exposed in the pores</span><output id="o-c-expo"></output></label>
+        <input type="range" id="c-expo" min="-5" max="0" step="0.05" value="-3"></div>
+      <div class="ctl"><label for="c-f"><span>Frequency cursor</span><output id="o-c-f"></output></label>
+        <input type="range" id="c-f" min="-3" max="6" step="0.02" value="1" style="accent-color:var(--cathodic)"></div>
+    </div>
+  </div>
+
+  <div class="circuitbox"><div id="c-diagram"></div><p class="cap" id="c-cdc"></p></div>
+
+  <div class="lab tri">
+    <div class="sheet"><canvas id="c-c-nyq" role="img" aria-label="Nyquist plot of the selected electrochemical system"></canvas>
+      <div class="legend"><span style="color:var(--ink)"><i></i><span>spectrum</span></span><span style="color:var(--cathodic)"><i></i><span>cursor</span></span></div></div>
+    <div class="sheet"><canvas id="c-c-mag" role="img" aria-label="Bode magnitude plot"></canvas></div>
+    <div class="sheet"><canvas id="c-c-pha" role="img" aria-label="Bode phase plot"></canvas></div>
+    <div class="controls">
+      <div class="row">
+        <dl class="readout" style="border:0;margin:0;padding:0">
+          <div><dt>R<sub>ct</sub> from k⁰</dt><dd id="r-c-rct"></dd></div>
+          <div><dt>Exchange current density, i₀</dt><dd id="r-c-i0"></dd></div>
+          <div><dt>Warburg coefficient, σ</dt><dd id="r-c-sig"></dd></div>
+          <div><dt>Apex frequency of the arc</dt><dd id="r-c-fc"></dd></div>
+        </dl>
+        <dl class="readout" style="border:0;margin:0;padding:0">
+          <div><dt>At the cursor, |Z|</dt><dd id="r-c-mod"></dd></div>
+          <div><dt>Phase of Z, φ</dt><dd id="r-c-phi"></dd></div>
+          <div><dt>Maximum phase in the sweep</dt><dd id="r-c-phimax"></dd></div>
+          <div><dt>R<sub>ct</sub> / R<sub>W</sub> at 1 Hz</dt><dd id="r-c-ratio"></dd></div>
+        </dl>
+      </div>
+      <p class="state" id="r-c-state"></p>
+    </div>
+  </div>
+  <p class="note prose">All impedances are for 1 cm², n = 1, at 25 °C. The redox couple is taken as symmetric, C<sub>O</sub>* = C<sub>R</sub>* and D<sub>O</sub> = D<sub>R</sub>.</p>
+</section>
+
+<section aria-labelledby="t34">
+  <h2 id="t34"><span class="sec">3.4</span>What each system is telling you</h2>
+  <div class="prose">
+    <p><strong>The blocking electrode.</strong> No redox couple, so no faradaic path. The circuit is just <span class="cdc">R<sub>u</sub>C<sub>dl</sub></span> in series and the Nyquist plot is a vertical line rising from <i>R</i><sub>u</sub>. This is the measurement used to extract double-layer capacitance and, from it, electrochemically active area.</p>
+    <p><strong>Kinetic control.</strong> Add a redox couple and a fast enough electrode and you get the single semicircle of <span class="cdc">R<sub>u</sub>(C<sub>dl</sub>R<sub>ct</sub>)</span>. Lower <i>k</i><sup>0</sup> and the arc grows; raise it and the arc shrinks toward the origin.</p>
+    <p><strong>Randles with diffusion.</strong> At low frequency the perturbation is slow enough that the depletion layer has time to grow, and the 45° Warburg tail appears. Whether you see a clean semicircle before it depends on the ratio of <i>R</i><sub>ct</sub> to the Warburg resistance; the arc is well separated only when <i>R</i><sub>ct</sub> ≳ σ/√ω over the measured range. Push <i>k</i><sup>0</sup> above about 10<sup>−2</sup> cm s<sup>−1</sup> and the semicircle disappears into the tail: the system is now so fast that the spectrum carries almost no kinetic information.</p>
+    <p><strong>The coated electrode.</strong> A film adds its own capacitance in parallel with the resistance of the electrolyte-filled pores through it, giving <span class="cdc">R<sub>u</sub>(C<sub>c</sub>[R<sub>pore</sub>(C<sub>dl</sub>R<sub>ct</sub>)])</span> and two time constants. The film is fast and appears at high frequency; the corroding metal underneath is slow and appears at low frequency. An intact coating shows only a near-vertical capacitive line, because <i>R</i><sub>pore</sub> is too large to measure.</p>
+    <p>The extra slider for the coated cases is worth dwelling on. Only the metal at the bottom of the pores is in contact with electrolyte, so the kinetics you measure belong to a small fraction of the geometric area. Both affected quantities scale with it, in opposite directions: <i>R</i><sub>ct</sub> is inversely proportional to the exposed area and <i>C</i><sub>dl</sub> is proportional to it. This is why a coated sample can show an enormous charge-transfer resistance while the metal itself is perfectly ordinary, and why a capacitance measured on a coated electrode is a direct estimate of how much metal is exposed.</p>
+  </div>
+</section>
+
+<section aria-labelledby="t35">
+  <h2 id="t35"><span class="sec">3.5</span>The constant phase element</h2>
+  <div class="prose">
+    <p>Real electrodes almost never give the perfect semicircle these equations predict. The arc is flattened, its centre sits below the real axis, and the phase maximum falls short of 90°. The usual repair replaces the ideal capacitor by a constant phase element:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>Z</mi><mrow><mi>C</mi><mi>P</mi><mi>E</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>Q</mi><mtext> </mtext><mo stretchy="false">(</mo><mi>j</mi><mi>ω</mi><msup><mo stretchy="false">)</mo><mi>n</mi></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">Z_{CPE} = \frac{1}{Q\,(j\omega)^{n}}</annotation></semantics></math></span></div>
+    <p>The exponent <i>n</i> carries the meaning. At <i>n</i> = 1 the element is an ideal capacitor and <i>Q</i> has units of farads. At <i>n</i> = 0 it is a pure resistor. At <i>n</i> = 0.5 it is mathematically a Warburg impedance. In between, the phase is held constant at −90°<i>n</i> across the whole frequency range, which is where the name comes from.</p>
+    <p>A CPE is a description, not an explanation. Surface roughness, a distribution of reaction rates across the surface, porosity and slow adsorption of impurities have all been proposed as the origin, and the question is not settled. What you should report is <i>Q</i> and <i>n</i> together, since <i>Q</i> alone has no physical meaning, plus an effective capacitance if you need one:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>C</mi><mrow><mi>e</mi><mi>f</mi><mi>f</mi></mrow></msub><mo>=</mo><msup><mrow><mo fence="true">[</mo><mi>Q</mi><msup><mrow><mo fence="true">(</mo><mfrac><mn>1</mn><msub><mi>R</mi><mi>u</mi></msub></mfrac><mo>+</mo><mfrac><mn>1</mn><msub><mi>R</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub></mfrac><mo fence="true">)</mo></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><mo fence="true">]</mo></mrow><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>n</mi></mrow></msup></mrow><annotation encoding="application/x-tex">C_{eff} = \left[Q\left(\frac{1}{R_u}+\frac{1}{R_{ct}}\right)^{n-1}\right]^{1/n}</annotation></semantics></math></span></div>
+    <p>Move the <i>n</i> slider in the explorer above from 1 down to 0.8 and watch the arc sink. A measured <i>n</i> below about 0.8 usually means the surface is genuinely heterogeneous, and the capacitance you extract from it should be treated as an estimate.</p>
+  </div>
+  <div class="srcnote">Sections 3.2 to 3.5 follow Bard &amp; Faulkner, 2nd ed., sections 10.1.3, 10.2 and 10.4, together with Lazanas and Prodromidis, sections 11 to 13.</div>
+</section>
+</div>
+
+<!-- ============================ TAB 4 ============================ -->
+<div class="panel" id="panel-4" role="tabpanel" aria-labelledby="tab-4" hidden>
+
+<section aria-labelledby="t41">
+  <h2 id="t41"><span class="sec">4.1</span>When can you resolve two processes?</h2>
+  <div class="prose">
+    <p>Real systems rarely have one time constant. A coated metal has at least two, a battery electrode three or four, and the practical question is always the same: are these two arcs, or one arc drawn badly?</p>
+    <p>Move the separation below and watch the answer. The test to apply to your own data is the Bode phase plot: two resolvable processes give two peaks, and anything else is a single feature however much you want it to be two.</p>
+  </div>
+  <div class="lab two">
+    <div class="sheet"><canvas id="c-d-nyq" role="img" aria-label="Nyquist plot of two time constants at a chosen separation"></canvas>
+      <div class="legend"><span style="color:var(--ink)"><i></i><span>total</span></span>
+        <span style="color:var(--ink-soft)"><i class="dash"></i><span>each loop alone</span></span></div></div>
+    <div class="sheet"><canvas id="c-d-pha" role="img" aria-label="Bode phase plot of the same two time constants"></canvas></div>
+    <div class="controls">
+      <div class="ctl"><label for="d-sep"><span>Separation of the time constants</span><output id="o-d-sep"></output></label>
+        <input type="range" id="d-sep" min="0" max="5" step="0.1" value="3"></div>
+      <div class="ctl"><label for="d-ratio"><span>Relative size of the two arcs</span><output id="o-d-ratio"></output></label>
+        <input type="range" id="d-ratio" min="-1" max="1" step="0.05" value="0"></div>
+      <dl class="readout">
+        <div><dt>τ₁ (fast loop)</dt><dd id="r-d-t1"></dd></div>
+        <div><dt>τ₂ (slow loop)</dt><dd id="r-d-t2"></dd></div>
+        <div><dt>Ratio τ₂/τ₁</dt><dd id="r-d-tr"></dd></div>
+        <div><dt>Peaks visible in the phase</dt><dd id="r-d-pk"></dd></div>
+      </dl>
+      <p class="state" id="r-d-state"></p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t42">
+  <h2 id="t42"><span class="sec">4.2</span>Corrosion: watching a coating fail</h2>
+  <div class="prose">
+    <p>This is the application where EIS earns its keep, because it detects degradation long before anything is visible. An epoxy coating on carbon steel, 10 cm² exposed, followed over several weeks of immersion. Drag the slider through the exposure.</p>
+  </div>
+  <div class="lab two">
+    <div class="sheet"><canvas id="c-e-bode" role="img" aria-label="Bode magnitude of a coating at several immersion times"></canvas>
+      <div class="legend"><span style="color:var(--ink-soft)"><i></i><span>earlier times</span></span>
+        <span style="color:var(--cathodic)"><i></i><span>selected time</span></span></div></div>
+    <div class="sheet"><canvas id="c-e-nyq" role="img" aria-label="Nyquist plot of the coating at the selected time"></canvas></div>
+    <div class="controls">
+      <div class="ctl"><label for="e-day"><span>Immersion time</span><output id="o-e-day"></output></label>
+        <input type="range" id="e-day" min="0" max="5" step="1" value="0" style="accent-color:var(--cathodic)"></div>
+      <dl class="readout">
+        <div><dt>|Z| at 10 mHz</dt><dd id="r-e-z"></dd></div>
+        <div><dt>Coating capacitance, C<sub>c</sub></dt><dd id="r-e-cc"></dd></div>
+        <div><dt>Pore resistance, R<sub>pore</sub></dt><dd id="r-e-rp"></dd></div>
+        <div><dt>Water uptake (Brasher–Kingsbury)</dt><dd id="r-e-up"></dd></div>
+        <div><dt>R<sub>ct</sub> of the metal</dt><dd id="r-e-rct"></dd></div>
+        <div><dt>Corrosion rate from Stern–Geary</dt><dd id="r-e-cr"></dd></div>
+      </dl>
+      <p class="state" id="r-e-state"></p>
+    </div>
+  </div>
+  <div class="prose">
+    <p>Three numbers do the work. The low-frequency modulus ranks coatings on a single axis, with 10<sup>6</sup> Ω cm² the usual rough line between protective and failing. The coating capacitance tracks water uptake through the Brasher–Kingsbury relation, because water has a permittivity of about 80 against 4 for a dry polymer:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>ϕ</mi><mrow><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></mrow></msub><mo>=</mo><mfrac><mrow><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>C</mi><mi>t</mi></msub><mi mathvariant="normal">/</mi><msub><mi>C</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><mrow><mi>log</mi><mo>⁡</mo><mn>80</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">\phi_{H_2O} = \frac{\log(C_t/C_0)}{\log 80}</annotation></semantics></math></span></div>
+    <p>And once a low-frequency arc appears, its diameter is a polarization resistance that converts to a corrosion current through Stern–Geary, the same equation used in linear polarization:</p>
+    <div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>i</mi><mrow><mi>c</mi><mi>o</mi><mi>r</mi><mi>r</mi></mrow></msub><mo>=</mo><mfrac><mi>B</mi><msub><mi>R</mi><mi>p</mi></msub></mfrac><mo separator="true">,</mo><mspace width="2em"/><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>b</mi><mi>a</mi></msub><msub><mi>b</mi><mi>c</mi></msub></mrow><mrow><mn>2.303</mn><mtext> </mtext><mo stretchy="false">(</mo><msub><mi>b</mi><mi>a</mi></msub><mo>+</mo><msub><mi>b</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">i_{corr} = \frac{B}{R_p}, \qquad B = \frac{b_a b_c}{2.303\,(b_a+b_c)}</annotation></semantics></math></span></div>
+  </div>
+</section>
+
+<section aria-labelledby="t43">
+  <h2 id="t43"><span class="sec">4.3</span>Sensors: the arc as a signal</h2>
+  <div class="prose">
+    <p>In faradaic impedance biosensing the electrode carries a recognition layer and the solution carries a redox probe, usually ferri/ferrocyanide. Binding the target blocks part of the surface, the probe finds it harder to reach the electrode, and <i>R</i><sub>ct</sub> rises. The arc diameter <em>is</em> the analytical signal.</p>
+  </div>
+  <div class="lab two">
+    <div class="sheet"><canvas id="c-f-nyq" role="img" aria-label="Nyquist plots of a biosensor at increasing analyte concentration"></canvas>
+      <div class="legend"><span style="color:var(--ink-soft)"><i></i><span>blank and lower concentrations</span></span>
+        <span style="color:var(--cathodic)"><i></i><span>selected concentration</span></span></div></div>
+    <div class="sheet"><canvas id="c-f-cal" role="img" aria-label="Calibration curve of charge-transfer resistance against concentration"></canvas>
+      <p class="cap">Calibration: the relative change in R<sub>ct</sub> against the logarithm of concentration, with a Langmuir-type response.</p></div>
+    <div class="controls">
+      <div class="ctl"><label for="f-conc"><span>Analyte concentration</span><output id="o-f-conc"></output></label>
+        <input type="range" id="f-conc" min="-12" max="-6" step="0.1" value="-9" style="accent-color:var(--cathodic)"></div>
+      <div class="ctl"><label for="f-kd"><span>Dissociation constant, K<sub>d</sub></span><output id="o-f-kd"></output></label>
+        <input type="range" id="f-kd" min="-11" max="-7" step="0.1" value="-9"></div>
+      <div class="ctl"><label for="f-noise"><span>Electrode-to-electrode scatter</span><output id="o-f-noise"></output></label>
+        <input type="range" id="f-noise" min="0" max="20" step="1" value="5"></div>
+      <dl class="readout">
+        <div><dt>R<sub>ct</sub>, blank</dt><dd id="r-f-r0"></dd></div>
+        <div><dt>R<sub>ct</sub>, with analyte</dt><dd id="r-f-r1"></dd></div>
+        <div><dt>Signal, ΔR<sub>ct</sub>/R<sub>ct,0</sub></dt><dd id="r-f-sig"></dd></div>
+        <div><dt>Surface coverage</dt><dd id="r-f-cov"></dd></div>
+      </dl>
+      <p class="state" id="r-f-state"></p>
+    </div>
+  </div>
+  <p class="note prose">The usable range of any such sensor is set by K<sub>d</sub>: the response is near-linear in log C only within about two decades around it, saturates above, and disappears into the electrode-to-electrode scatter below. Raise the scatter slider and watch the lower end of the calibration curve become undetectable.</p>
+</section>
+
+<section aria-labelledby="t44">
+  <h2 id="t44"><span class="sec">4.4</span>Inductive loops, real and artificial</h2>
+  <div class="prose">
+    <p>Points below the real axis are not always an artifact, and telling the two cases apart is a matter of which end of the spectrum they appear at.</p>
+    <p><strong>At high frequency</strong> the loop of cable between the potentiostat and the cell has inductance of the order of a microhenry per metre. Its reactance grows with frequency, so above a few kilohertz it adds a positive imaginary part that pulls the spectrum below the axis. It is invisible on a megohm cell and ruinous on a milliohm one, which is why battery and fuel-cell work demands short, twisted, shielded leads.</p>
+    <p><strong>At low frequency</strong> an inductive loop is usually real chemistry: an adsorbed intermediate whose coverage relaxes on the timescale of the perturbation. Iron dissolving in sulfuric acid shows exactly this through the adsorbed FeOH intermediate, and the loop is diagnostic of the mechanism rather than a nuisance.</p>
+  </div>
+  <div class="lab two">
+    <div class="sheet"><canvas id="c-g-nyq" role="img" aria-label="Nyquist plot showing an inductive loop"></canvas></div>
+    <div class="sheet"><canvas id="c-g-pha" role="img" aria-label="Bode phase plot showing where the phase becomes positive"></canvas></div>
+    <div class="controls">
+      <div class="ctl"><label for="g-kind"><span>Source of the loop</span>
+        <select id="g-kind">
+          <option value="cable" selected>Cable inductance, high frequency</option>
+          <option value="ads">Adsorbed intermediate, low frequency</option>
+        </select></label></div>
+      <div class="ctl"><label for="g-mag"><span>Strength of the effect</span><output id="o-g-mag"></output></label>
+        <input type="range" id="g-mag" min="0" max="3" step="0.05" value="1.5"></div>
+      <div class="ctl"><label for="g-rct"><span>R<sub>ct</sub> of the cell</span><output id="o-g-rct"></output></label>
+        <input type="range" id="g-rct" min="-1" max="5" step="0.05" value="0.3"></div>
+      <dl class="readout">
+        <div><dt>Frequencies with φ &gt; 0</dt><dd id="r-g-n"></dd></div>
+        <div><dt>Lowest such frequency</dt><dd id="r-g-flo"></dd></div>
+        <div><dt>Highest such frequency</dt><dd id="r-g-fhi"></dd></div>
+      </dl>
+      <p class="state" id="r-g-state"></p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t45">
+  <h2 id="t45"><span class="sec">4.5</span>Fitting, by hand</h2>
+  <div class="prose">
+    <p>Choose a dataset, choose a model, and move the sliders until the curves overlap and the residuals are flat and scattered about zero. There is no automatic fit here on purpose: driving the parameters yourself is what teaches which one owns which feature of the spectrum.</p>
+    <p>Judge the fit on the residuals, never on the Nyquist overlay. The overlay is dominated by the largest impedances and will look convincing while the model is wrong; the residual plot will show a smooth curve with frequency instead of noise. The chi-squared value quoted by fitting software is the sum of squared relative residuals, and values below about 10<sup>−4</sup> are usually acceptable.</p>
+  </div>
+  <div class="lab tri">
+    <div class="sheet"><canvas id="c-h-nyq" role="img" aria-label="Nyquist plot of the dataset and the current model"></canvas>
+      <div class="legend"><span style="color:var(--cathodic)"><i></i><span>data</span></span>
+        <span style="color:var(--ink)"><i class="dash"></i><span>model</span></span></div></div>
+    <div class="sheet"><canvas id="c-h-bode" role="img" aria-label="Bode magnitude and phase of the dataset and the model"></canvas>
+      <p class="cap">Magnitude on the logarithmic axis; the phase shares the box, 0° at the bottom and 90° at the top.</p></div>
+    <div class="sheet"><canvas id="c-h-res" role="img" aria-label="Relative residuals in the real and imaginary parts against frequency"></canvas>
+      <div class="legend"><span style="color:var(--cathodic)"><i></i><span>residual in Z′</span></span>
+        <span style="color:var(--anodic)"><i></i><span>residual in Z″</span></span></div></div>
+    <div class="controls">
+      <div class="row">
+        <div class="ctl"><label for="h-data"><span>Dataset</span>
+          <select id="h-data">
+            <option value="ideal" selected>Bare electrode, ideal capacitor</option>
+            <option value="cpe">Bare electrode, depressed arc</option>
+            <option value="warburg">With diffusion tail</option>
+            <option value="coating">Coated steel, two time constants</option>
+          </select></label></div>
+        <div class="ctl"><label for="h-model"><span>Model</span>
+          <select id="h-model">
+            <option value="randles" selected>R(CR)</option>
+            <option value="randlesCPE">R(QR)</option>
+            <option value="randlesW">R(C[RW])</option>
+            <option value="randlesCPEW">R(Q[RW])</option>
+            <option value="coating">R(C[R(CR)])</option>
+          </select></label></div>
+        <div class="ctl"><label for="h-noise"><span>Noise on the data</span><output id="o-h-noise"></output></label>
+          <input type="range" id="h-noise" min="0" max="5" step="0.5" value="1"></div>
+        <div class="ctl"><label for="h-rs"><span>R<sub>u</sub></span><output id="o-h-rs"></output></label>
+          <input type="range" id="h-rs" min="1" max="200" step="1" value="20"></div>
+        <div class="ctl"><label for="h-rct"><span>R<sub>ct</sub></span><output id="o-h-rct"></output></label>
+          <input type="range" id="h-rct" min="1" max="6" step="0.02" value="3"></div>
+        <div class="ctl"><label for="h-q"><span>C<sub>dl</sub> or Q</span><output id="o-h-q"></output></label>
+          <input type="range" id="h-q" min="-7" max="-2" step="0.02" value="-4.5"></div>
+        <div class="ctl"><label for="h-n"><span>CPE exponent, n</span><output id="o-h-n"></output></label>
+          <input type="range" id="h-n" min="0.5" max="1" step="0.01" value="1"></div>
+        <div class="ctl"><label for="h-sigma"><span>Warburg σ</span><output id="o-h-sigma"></output></label>
+          <input type="range" id="h-sigma" min="0" max="3.5" step="0.05" value="0"></div>
+        <div class="ctl"><label for="h-rpore"><span>R<sub>pore</sub></span><output id="o-h-rpore"></output></label>
+          <input type="range" id="h-rpore" min="1" max="8" step="0.05" value="5"></div>
+        <div class="ctl"><label for="h-cc"><span>C<sub>c</sub></span><output id="o-h-cc"></output></label>
+          <input type="range" id="h-cc" min="-11" max="-7" step="0.02" value="-9.5"></div>
+      </div>
+      <dl class="readout">
+        <div><dt>χ² (relative, ×10⁻³)</dt><dd id="r-h-chi"></dd></div>
+        <div><dt>Largest residual</dt><dd id="r-h-max"></dd></div>
+        <div><dt>Residual pattern</dt><dd id="r-h-pat"></dd></div>
+        <div><dt>Effective capacitance</dt><dd id="r-h-ceff"></dd></div>
+      </dl>
+      <p class="state" id="r-h-hint"></p>
+      <div style="margin-top:10px"><button type="button" id="h-new">New noise</button><button type="button" id="h-reveal">Show the true values</button></div>
+      <p class="state" id="r-h-true" hidden></p>
+    </div>
+  </div>
+  <details>
+    <summary>Fit your own spectrum instead</summary>
+    <p class="note">Paste three columns: frequency in Hz, Z′ and Z″ in ohms, separated by commas, tabs or spaces. Export the spectrum from your potentiostat software as CSV and drop it here. Either sign convention for Z″ works; the tool detects it.</p>
+    <textarea id="h-csv" placeholder="100000, 20.4, -1.2&#10;10000, 21.9, -8.7&#10;1000, 45.1, -38.0"></textarea>
+    <p><button type="button" id="h-use">Use my data</button><button type="button" id="h-sim">Back to the simulated dataset</button>
+      <span class="note" id="r-h-csv"></span></p>
+  </details>
+</section>
+
+<section aria-labelledby="t46">
+  <h2 id="t46"><span class="sec">4.6</span>Before you believe any of it</h2>
+  <div class="prose">
+    <p>A spectrum is only interpretable if the three conditions from tab 1 held while it was recorded. The Kramers–Kronig relations connect the real and imaginary parts of any linear, causal, stable response, so a spectrum that fails to transform is a spectrum that violated one of them. In practice the test is run by fitting a Voigt circuit, a long chain of <span class="cdc">(RC)</span> elements with fixed time constants, which can fit anything that is Kramers–Kronig transformable and nothing that is not.</p>
+  </div>
+  <h3>Practical checklist</h3>
+  <ul class="plain">
+    <li><strong>Amplitude.</strong> 5 to 10 mV peak unless you have shown the response is still linear. Check whether a literature value is quoted as peak, peak-to-peak or rms: 10 mV peak is 20 mV peak-to-peak and 7 mV rms.</li>
+    <li><strong>Frequency range.</strong> Wide enough to cover every time constant present. 100 kHz down to 10 mHz covers most aqueous work; solid electrolytes need megahertz, coatings need millihertz.</li>
+    <li><strong>Time.</strong> One cycle at 1 mHz lasts 1000 s, so a few averaged cycles at the bottom of the sweep cost most of an hour. Ask whether your sample is still the same sample by then.</li>
+    <li><strong>Stationarity.</strong> Record the open-circuit potential before and after. If it moved, the spectrum is not of one state.</li>
+    <li><strong>Connections.</strong> Short, shielded, twisted leads; cage closed and grounded at one point; nothing else switching on and off nearby.</li>
+    <li><strong>Validation.</strong> Run the Kramers–Kronig test before interpreting anything, and inspect the residuals rather than χ² alone.</li>
+    <li><strong>Reporting.</strong> Give the circuit, every fitted parameter with its error, the χ², and the physical justification for each element. For a CPE report <i>Q</i> and <i>n</i> together, never <i>Q</i> alone.</li>
+  </ul>
+</section>
+
+<section id="check" class="qa" aria-labelledby="t47">
+  <h2 id="t47"><span class="sec">4.7</span>Check your understanding</h2>
+  <details>
+    <summary>A Nyquist plot looks like a perfect semicircle, but the phase maximum is only 68°. What does that tell you?</summary>
+    <p>That the arc is depressed, and the eye cannot see it. An ideal parallel RC combination approaches −90° when the resistances are well separated; a constant phase element caps the phase near 90°<i>n</i>, so 68° suggests <i>n</i> ≈ 0.76. Fit with a CPE and report <i>n</i>. Never judge ideality from the Nyquist shape alone.</p>
+  </details>
+  <details>
+    <summary>Two spectra have the same R<sub>ct</sub> but their arcs peak at different frequencies. What differs?</summary>
+    <p>The capacitance, since the apex sits at ω = 1/R<sub>ct</sub>C<sub>dl</sub>. A larger C<sub>dl</sub> at the same R<sub>ct</sub> means more active area or a rougher surface, which is also why effective capacitance is used to estimate electrochemically active area.</p>
+  </details>
+  <details>
+    <summary>Your spectrum dives below the real axis above 10 kHz. Is that chemistry?</summary>
+    <p>Almost certainly not. At the high-frequency end this is the inductance of the cable loop, and it scales with lead length. Shorten and twist the leads and the loop shrinks. An inductive loop at the <em>low</em>-frequency end is a different matter and usually indicates a relaxing adsorbed intermediate.</p>
+  </details>
+  <details>
+    <summary>Why can a fit with a low χ² still be wrong?</summary>
+    <p>Because χ² measures distance, not structure. A model missing an element often produces residuals that curve smoothly with frequency while remaining small. Systematic residuals mean the circuit is wrong no matter how small they are. Beyond that, several circuits can be mathematically identical, so fit quality alone can never select between them.</p>
+  </details>
+  <details>
+    <summary>You need the spectrum down to 1 mHz on a sample that corrodes visibly in an hour. What do you do?</summary>
+    <p>Accept that you cannot. One cycle at 1 mHz is 1000 s, and a few averaged cycles put you past the hour, during which the system is no longer stationary and the Kramers–Kronig conditions are violated. Either stop at a higher frequency, slow the system down, or record a sequence of faster spectra and report the evolution.</p>
+  </details>
+  <details>
+    <summary>A blocking electrode should give a vertical line. Yours is tilted by 15°. What do you report?</summary>
+    <p>A CPE rather than a capacitance. The tilt is 90°(1 − <i>n</i>), so 15° corresponds to <i>n</i> ≈ 0.83. Report <i>Q</i> and <i>n</i>, and if you need a capacitance for an area estimate, convert it with the appropriate effective-capacitance formula and say which one you used.</p>
+  </details>
+</section>
+</div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Conventions: Z″ is negative for capacitive behaviour and Nyquist plots show −Z″; areas are geometric; simulations use n = 1 at 25 °C. Prepared by Sergio Blanco, PhD. Connect on <a href="https://www.linkedin.com/in/sergio-blanco-professor/" target="_blank" rel="noopener">LinkedIn</a>.</p>
+    <p>Sources and further reading</p>
+    <ol>
+      <li>A. D. Lazanas, M. I. Prodromidis, Electrochemical impedance spectroscopy: a tutorial, <i>ACS Meas. Sci. Au</i> 3 (2023) 162–193. The structure of tabs 1 and 2 follows this tutorial closely.</li>
+      <li>A. J. Bard, L. R. Faulkner, <i>Electrochemical Methods: Fundamentals and Applications</i>, 2nd ed., Wiley, 2001, chapter 10, in particular sections 10.1 to 10.4 and 10.8.</li>
+      <li>M. E. Orazem, B. Tribollet, <i>Electrochemical Impedance Spectroscopy</i>, 2nd ed., Wiley, 2017.</li>
+      <li>G. J. Brug, A. L. G. van den Eeden, M. Sluyters-Rehbach, J. H. Sluyters, The analysis of electrode impedances complicated by the presence of a constant phase element, <i>J. Electroanal. Chem.</i> 176 (1984) 275–295.</li>
+      <li>D. M. Brasher, A. H. Kingsbury, Electrical measurements in the study of immersed paint coatings on metal, <i>J. Appl. Chem.</i> 4 (1954) 62–72.</li>
+      <li>B. A. Boukamp, A linear Kronig–Kramers transform test for immittance data validation, <i>J. Electrochem. Soc.</i> 142 (1995) 1885–1894.</li>
+      <li>M. Stern, A. L. Geary, Electrochemical polarization I, <i>J. Electrochem. Soc.</i> 104 (1957) 56–63.</li>
+    </ol>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+const F = 96485.33212, R = 8.314462618, T25 = 298.15;
+const $ = id => document.getElementById(id);
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- formatting ---------- */
+const SUP = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","-":"⁻"};
+const sup = n => String(n).split("").map(c => SUP[c] || c).join("");
+const minus = s => String(s).replace(/-/g, "−");
+const fx = (v, d) => minus(v.toFixed(d));
+function sci(v, sig){
+  sig = sig || 2;
+  if (v === 0 || !isFinite(v)) return "0";
+  let e = Math.floor(Math.log10(Math.abs(v)));
+  let m = v / Math.pow(10, e);
+  if (Math.abs(+m.toFixed(sig-1)) >= 10) { m /= 10; e += 1; }
+  return minus(m.toFixed(sig-1)) + " × 10" + sup(e);
+}
+function smart(v, unit){
+  const a = Math.abs(v);
+  if (a >= 0.01 && a < 1e4) return fx(v, a >= 100 ? 0 : a >= 10 ? 1 : 2) + " " + unit;
+  return sci(v, 2) + " " + unit;
+}
+function ohms(v){ // ohm cm2
+  if (v >= 1e6) return sci(v,2) + " Ω cm²";
+  if (v >= 1e3) return fx(v/1e3, v>=1e5?0:1) + " kΩ cm²";
+  if (v >= 1) return fx(v, v>=100?0:1) + " Ω cm²";
+  return fx(v*1e3, 1) + " mΩ cm²";
+}
+
+/* ---------- plotting ---------- */
+function niceStep(range, count){
+  const raw = range / count, p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+  return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p;
+}
+function ticks(min, max, count){
+  const st = niceStep(max - min, count), out = [];
+  for (let v = Math.ceil(min/st - 1e-9)*st; v <= max + st*1e-9; v += st) out.push(+v.toFixed(12));
+  return out;
+}
+function defFmt(v){
+  if (Math.abs(v) < 1e-12) return "0";
+  const a = Math.abs(v);
+  if (a >= 1e4 || a < 1e-3) return sci(v,1);
+  return minus(String(+v.toPrecision(4)));
+}
+const logFmt = v => Number.isInteger(v) ? "10" + sup(v) : "";
+function intTicks(min, max, maxCount){
+  const span = Math.floor(max) - Math.ceil(min);
+  const step = Math.max(1, Math.ceil(span / maxCount));
+  const out = [];
+  for (let v = Math.ceil(min); v <= max; v += step) out.push(v);
+  return out;
+}
+
+function plot(canvas, o){
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return null;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  const m = Object.assign({l:70, r:14, t:12, b:50}, o.margin || {});
+  const pw = w - m.l - m.r, ph = h - m.t - m.b;
+  const X = x => m.l + (x - o.xmin) / (o.xmax - o.xmin) * pw;
+  const Y = y => m.t + (1 - (y - o.ymin) / (o.ymax - o.ymin)) * ph;
+  const ink = cssv("--ink"), soft = cssv("--ink-soft");
+  const sans = cssv("--sans");
+  const xt = o.xticks || ticks(o.xmin, o.xmax, Math.max(3, Math.round(pw/85)));
+  const yt = o.yticks || ticks(o.ymin, o.ymax, Math.max(3, Math.round(ph/55)));
+
+  ctx.lineWidth = 1; ctx.strokeStyle = cssv("--plot-grid");
+  xt.forEach(v => { const px = Math.round(X(v))+.5; ctx.beginPath(); ctx.moveTo(px, m.t); ctx.lineTo(px, m.t+ph); ctx.stroke(); });
+  yt.forEach(v => { const py = Math.round(Y(v))+.5; ctx.beginPath(); ctx.moveTo(m.l, py); ctx.lineTo(m.l+pw, py); ctx.stroke(); });
+  ctx.strokeStyle = soft;
+  if (!o.noZero && !o.logY && o.ymin < 0 && o.ymax > 0){ const py=Math.round(Y(0))+.5; ctx.beginPath(); ctx.moveTo(m.l,py); ctx.lineTo(m.l+pw,py); ctx.stroke(); }
+  if (!o.noZero && o.xmin < 0 && o.xmax > 0){ const px=Math.round(X(0))+.5; ctx.beginPath(); ctx.moveTo(px,m.t); ctx.lineTo(px,m.t+ph); ctx.stroke(); }
+  ctx.strokeStyle = ink; ctx.lineWidth = 1.2; ctx.strokeRect(m.l+.5, m.t+.5, pw-1, ph-1);
+
+  ctx.font = "500 12.5px " + sans; ctx.fillStyle = soft;
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  xt.forEach(v => ctx.fillText((o.xfmt||defFmt)(v), X(v), m.t+ph+6));
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  yt.forEach(v => ctx.fillText((o.yfmt||defFmt)(v), m.l-7, Y(v)));
+  ctx.font = "600 13.5px " + sans; ctx.fillStyle = ink;
+  ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+  ctx.fillText(o.xlabel || "", m.l + pw/2, h - 4);
+  ctx.save(); ctx.translate(15, m.t + ph/2); ctx.rotate(-Math.PI/2); ctx.textBaseline = "middle";
+  ctx.fillText(o.ylabel || "", 0, 0); ctx.restore();
+
+  ctx.save(); ctx.beginPath(); ctx.rect(m.l+1, m.t+1, pw-2, ph-2); ctx.clip();
+  (o.bands||[]).forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(X(b.x0), m.t, X(b.x1)-X(b.x0), ph); });
+  const line = (x0,y0,x1,y1,color,dash,width) => { ctx.strokeStyle=color; ctx.lineWidth=width||1.5; ctx.setLineDash(dash||[]); ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke(); ctx.setLineDash([]); };
+  (o.hlines||[]).forEach(l => line(m.l, Y(l.y), m.l+pw, Y(l.y), l.color, l.dash, l.width));
+  (o.vlines||[]).forEach(l => line(X(l.x), m.t, X(l.x), m.t+ph, l.color, l.dash, l.width));
+  (o.series||[]).forEach(s => {
+    ctx.strokeStyle = s.color; ctx.lineWidth = s.width || 2.4; ctx.setLineDash(s.dash || []);
+    ctx.lineJoin = "round"; ctx.beginPath();
+    let pen = false; const N = s.upto != null ? s.upto : s.x.length;
+    for (let k = 0; k < N; k++){
+      const yv = s.y[k];
+      if (!isFinite(yv)) { pen = false; continue; }
+      const px = X(s.x[k]), py = Math.max(-5000, Math.min(5000, Y(yv)));
+      if (!pen) { ctx.moveTo(px, py); pen = true; } else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+  (o.points||[]).forEach(p => {
+    ctx.beginPath(); ctx.arc(X(p.x), Y(p.y), p.r || 3.2, 0, 2*Math.PI);
+    if (p.hollow){ ctx.fillStyle = cssv("--sheet"); ctx.fill(); ctx.lineWidth = 1.8; ctx.strokeStyle = p.color; ctx.stroke(); }
+    else { ctx.fillStyle = p.color; ctx.fill(); }
+  });
+  if (o.after) o.after(ctx, X, Y, {m, pw, ph, sans, ink, soft});
+  ctx.restore();
+  return {X, Y, ctx, m, pw, ph};
+}
+function linspace(a, b, N){ const out = new Array(N); for (let k=0;k<N;k++) out[k] = a + (b-a)*k/(N-1); return out; }
+
+const drawers = [];
+function register(fn){ drawers.push(fn); }
+function redrawAll(){ drawers.forEach(fn => fn()); }
+function bindInputs(ids, fn){ ids.forEach(id => { const el = $(id); el.addEventListener("input", fn); el.addEventListener("change", fn); }); register(fn); }
+
+
+
+
+
+
+
+/* ---------- complex arithmetic ---------- */
+const CX = (re, im) => ({re, im});
+const cadd = (a,b) => CX(a.re+b.re, a.im+b.im);
+const cinv = a => { const d = a.re*a.re + a.im*a.im; return CX(a.re/d, -a.im/d); };
+const cabs = a => Math.hypot(a.re, a.im);
+const cdeg = a => Math.atan2(a.im, a.re)*180/Math.PI;
+const Zcpe = (w, Q, n) => { const m = 1/(Q*Math.pow(w, n)), a = n*Math.PI/2;
+  return CX(m*Math.cos(a), -m*Math.sin(a)); };
+
+/* ---------- units ---------- */
+function sig3(v){                        /* 3 significant figures, never in exponent form */
+  const a = Math.abs(v);
+  if (!isFinite(v) || a === 0) return "0";
+  const d = Math.max(0, Math.min(8, 2 - Math.floor(Math.log10(a))));
+  return v.toFixed(d);
+}
+const ohm = v => !isFinite(v) ? "\u2013" : v >= 1e9 ? sig3(v/1e9) + " G\u03a9"
+  : v >= 1e6 ? sig3(v/1e6) + " M\u03a9" : v >= 1e3 ? sig3(v/1e3) + " k\u03a9"
+  : v >= 0.1 ? sig3(v) + " \u03a9" : v >= 1e-4 ? sig3(v*1e3) + " m\u03a9"
+  : v > 0 ? sig3(v*1e6) + " \u00b5\u03a9" : "0 \u03a9";
+const farad = v => v >= 1e-3 ? sig3(v*1e3) + " mF" : v >= 1e-6 ? sig3(v*1e6) + " \u00b5F"
+  : v >= 1e-9 ? sig3(v*1e9) + " nF" : sig3(v*1e12) + " pF";
+const hz = v => v >= 1e6 ? sig3(v/1e6) + " MHz" : v >= 1e3 ? sig3(v/1e3) + " kHz"
+  : v >= 1 ? sig3(v) + " Hz" : sig3(v*1e3) + " mHz";
+const secs = v => v >= 1 ? sig3(v) + " s" : v >= 1e-3 ? sig3(v*1e3) + " ms"
+  : v >= 1e-6 ? sig3(v*1e6) + " \u00b5s" : sig3(v*1e9) + " ns";
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+  let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+  return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const gaussFrom = r => { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+
+/* ---------- circuit spec: impedance ---------- */
+function Zel(b, w, V){
+  const v = V[b.k];
+  if (b.t === "R") return CX(v, 0);
+  if (b.t === "C") return CX(0, -1/(w*v));
+  if (b.t === "L") return CX(0, w*v);
+  if (b.t === "W") return CX(v/Math.sqrt(w), -v/Math.sqrt(w));
+  if (b.t === "Q") return Zcpe(w, v, V[b.nk] != null ? V[b.nk] : 1);
+  return CX(0,0);
+}
+function Zspec(spec, w, V){
+  let Z = CX(0,0);
+  for (const b of spec){
+    if (b.par){
+      let Y = CX(0,0);
+      for (const br of b.par) Y = cadd(Y, cinv(Zspec(br, w, V)));
+      Z = cadd(Z, cinv(Y));
+    } else Z = cadd(Z, Zel(b, w, V));
+  }
+  return Z;
+}
+function grid(lo, hi, n){
+  const a = [];
+  for (let k = 0; k <= n; k++) a.push(Math.pow(10, hi - k*(hi-lo)/n));
+  return a;
+}
+const spectrum = (spec, V, g) => g.map(f => ({f, Z: Zspec(spec, 2*Math.PI*f, V)}));
+
+/* ---------- circuit spec: SVG drawing ---------- */
+const EW = 58, EH = 20, LEAD = 20, VSP = 52;
+const bWidth = b => b.par ? Math.max.apply(null, b.par.map(brWidth)) + 2*LEAD : EW;
+const brWidth = br => br.reduce((s,b) => s + bWidth(b), 0) + LEAD*Math.max(0, br.length - 1);
+const bSpan = b => b.par ? (b.par.length - 1)*VSP : 0;
+function brSpan(br){ return br.reduce((m,b) => Math.max(m, bSpan(b)), 0); }
+
+function symbol(t, cx, cy, lab, sub){
+  const ink = "var(--ink)", soft = "var(--ink-soft)";
+  let s = "";
+  const half = 22;
+  s += "<line x1='" + (cx-EW/2) + "' y1='" + cy + "' x2='" + (cx-half) + "' y2='" + cy + "'/>";
+  s += "<line x1='" + (cx+half) + "' y1='" + cy + "' x2='" + (cx+EW/2) + "' y2='" + cy + "'/>";
+  if (t === "R" || t === "W" || t === "Q"){
+    s += "<rect x='" + (cx-half) + "' y='" + (cy-EH/2) + "' width='" + (2*half) + "' height='" + EH +
+         "' rx='2' fill='var(--sheet)'/>";
+    if (t === "W") s += "<text x='" + cx + "' y='" + (cy+4) + "' text-anchor='middle' font-size='12' " +
+      "font-family='var(--sans)' stroke='none' fill='" + ink + "'>W</text>";
+    if (t === "Q") s += "<line x1='" + (cx-7) + "' y1='" + (cy+7) + "' x2='" + (cx+7) + "' y2='" + (cy-7) + "'/>";
+  } else if (t === "C"){
+    s += "<line x1='" + (cx-5) + "' y1='" + (cy-12) + "' x2='" + (cx-5) + "' y2='" + (cy+12) + "'/>";
+    s += "<line x1='" + (cx+5) + "' y1='" + (cy-12) + "' x2='" + (cx+5) + "' y2='" + (cy+12) + "'/>";
+    s += "<line x1='" + (cx-half) + "' y1='" + cy + "' x2='" + (cx-5) + "' y2='" + cy + "'/>";
+    s += "<line x1='" + (cx+5) + "' y1='" + cy + "' x2='" + (cx+half) + "' y2='" + cy + "'/>";
+  } else if (t === "L"){
+    let d = "M" + (cx-half) + " " + cy;
+    for (let k = 0; k < 4; k++) d += "a5.5 5.5 0 0 1 11 0";
+    s += "<path d='" + d + "' fill='none'/>";
+  }
+  const txt = lab + (sub ? "<tspan font-size='9' dy='3'>" + sub + "</tspan>" : "");
+  s += "<text x='" + cx + "' y='" + (cy-16) + "' text-anchor='middle' font-size='12.5' " +
+       "font-family='var(--sans)' font-weight='600' stroke='none' fill='" + soft + "'>" + txt + "</text>";
+  return s;
+}
+function drawBranch(br, x, y){
+  let s = "", cx = x;
+  br.forEach((b, i) => {
+    if (i) { s += "<line x1='" + cx + "' y1='" + y + "' x2='" + (cx+LEAD) + "' y2='" + y + "'/>"; cx += LEAD; }
+    s += drawBlock(b, cx, y); cx += bWidth(b);
+  });
+  return s;
+}
+function drawBlock(b, x, y){
+  if (!b.par) return symbol(b.dt || b.t, x + EW/2, y, b.lab, b.sub);
+  const w = bWidth(b), inner = w - 2*LEAD, n = b.par.length;
+  const span = (n-1)*VSP, y0 = y - span/2;
+  let s = "";
+  s += "<line x1='" + x + "' y1='" + y0 + "' x2='" + x + "' y2='" + (y0+span) + "'/>";
+  s += "<line x1='" + (x+w) + "' y1='" + y0 + "' x2='" + (x+w) + "' y2='" + (y0+span) + "'/>";
+  b.par.forEach((br, i) => {
+    const by = y0 + i*VSP, bw = brWidth(br), bx = x + LEAD + (inner - bw)/2;
+    s += "<line x1='" + x + "' y1='" + by + "' x2='" + bx + "' y2='" + by + "'/>";
+    s += "<line x1='" + (bx+bw) + "' y1='" + by + "' x2='" + (x+w) + "' y2='" + by + "'/>";
+    s += drawBranch(br, bx, by);
+  });
+  return s;
+}
+function circuitSVG(spec){
+  const w = brWidth(spec), span = brSpan(spec);
+  const H = span + 78, y = H/2 + 6, W = w + 64;
+  let s = "<svg viewBox='0 0 " + W + " " + H + "' width='" + Math.min(W, 620) +
+    "' role='img' aria-label='equivalent circuit diagram'>" +
+    "<g stroke='var(--ink)' stroke-width='1.4' fill='none' stroke-linecap='round'>";
+  s += "<line x1='6' y1='" + y + "' x2='32' y2='" + y + "'/>";
+  s += "<line x1='" + (W-32) + "' y1='" + y + "' x2='" + (W-6) + "' y2='" + y + "'/>";
+  s += "<circle cx='6' cy='" + y + "' r='3' fill='var(--sheet)'/>";
+  s += "<circle cx='" + (W-6) + "' cy='" + y + "' r='3' fill='var(--sheet)'/>";
+  s += drawBranch(spec, 32, y);
+  s += "</g></svg>";
+  return s;
+}
+
+/* ---------- plotting helpers ---------- */
+function nfmt(v){                        /* axis ticks: 2 significant figures, no 1-digit sci */
+  const a = Math.abs(v);
+  if (a < 1e-12) return "0";
+  if (a >= 1e4 || a < 1e-3) return sci(v, 2);
+  return minus(String(+v.toPrecision(4)));
+}
+function eqRange(canvas, xmax, ymax){
+  const w = (canvas.clientWidth || 300) - 84, h = (canvas.clientHeight || 300) - 62;
+  if (w <= 0 || h <= 0) return {xmax, ymax};
+  const s = Math.max(xmax/w, ymax/h);
+  return {xmax: s*w, ymax: s*h};
+}
+function drawNyquist(canvas, sp, cur, opts){
+  opts = opts || {};
+  const xs = sp.map(d => d.Z.re), ys = sp.map(d => -d.Z.im);
+  let xmax = Math.max.apply(null, xs)*1.06;
+  const yhi = Math.max.apply(null, ys), ylo = Math.min.apply(null, ys);
+  const mag = ys.map(Math.abs).sort((a,b) => a-b), med = mag[Math.floor(mag.length/2)];
+  let hi, lo;
+  if (xmax < 1e-9){                       /* purely reactive: no real part to set the scale */
+    const span = Math.max(med*4, 1e-12);
+    hi = yhi > 1e-12 ? span : span*0.12;
+    lo = ylo < -1e-12 ? -span : 0;
+    xmax = span;
+  } else {
+    hi = (opts.cap && yhi > xmax*opts.cap) ? xmax*opts.cap : yhi*1.08;
+    hi = Math.max(hi, xmax*0.12);
+    lo = ylo < 0 ? Math.max(ylo*1.25, -hi*0.55) : 0;
+  }
+  const pad = xmax*0.035;                 /* keep a trace lying on Z\u2032 = 0 inside the frame */
+  const r = eqRange(canvas, xmax + pad, hi - lo);
+  plot(canvas, {xmin:-pad, xmax:r.xmax - pad, ymin:lo, ymax: lo + r.ymax, noZero: lo >= 0,
+    xlabel:"Z\u2032 / \u03a9", ylabel:"\u2212Z\u2033 / \u03a9", xfmt:nfmt, yfmt:nfmt,
+    series:[{x:xs, y:ys, color:cssv("--ink"), width:2.6}].concat(opts.extra || []),
+    points: cur ? [{x:cur.Z.re, y:-cur.Z.im, color:cssv("--cathodic"), r:6}] : []});
+}
+function drawBodeMag(canvas, sp, cur, opts){
+  opts = opts || {};
+  const lf = sp.map(d => Math.log10(d.f)), lm = sp.map(d => Math.log10(cabs(d.Z)));
+  const ymin = Math.floor(Math.min.apply(null, lm)) - 0.3, ymax = Math.ceil(Math.max.apply(null, lm)) + 0.3;
+  const xmin = Math.min.apply(null, lf), xmax = Math.max.apply(null, lf);
+  plot(canvas, {xmin, xmax, ymin, ymax, logY:true, noZero:true,
+    xlabel:"f / Hz", ylabel:"|Z| / Ω", xfmt:logFmt, yfmt:logFmt,
+    xticks:intTicks(xmin, xmax, 7), yticks:intTicks(ymin, ymax, 7),
+    series:[{x:lf, y:lm, color:cssv("--ink"), width:2.6}].concat(opts.extra || []),
+    points: cur ? [{x:Math.log10(cur.f), y:Math.log10(cabs(cur.Z)), color:cssv("--cathodic"), r:6}] : []});
+}
+function drawBodePhase(canvas, sp, cur, opts){
+  opts = opts || {};
+  const lf = sp.map(d => Math.log10(d.f)), ph = sp.map(d => -cdeg(d.Z));
+  const lo = Math.min.apply(null, ph), hi = Math.max.apply(null, ph);
+  const xmin = Math.min.apply(null, lf), xmax = Math.max.apply(null, lf);
+  plot(canvas, {xmin, xmax, ymin: Math.min(-5, lo - 6), ymax: Math.max(95, hi + 6), noZero: lo >= 0,
+    xlabel:"f / Hz", ylabel:"−φ / degrees", xfmt:logFmt, xticks:intTicks(xmin, xmax, 7),
+    series:[{x:lf, y:ph, color:cssv("--ink"), width:2.6}].concat(opts.extra || []),
+    points: cur ? [{x:Math.log10(cur.f), y:-cdeg(cur.Z), color:cssv("--cathodic"), r:6}] : []});
+}
+
+/* ---------- tabs ---------- */
+const TABS = ["1","2","3","4"];
+let activeTab = "1";
+function showTab(id){
+  activeTab = id;
+  TABS.forEach(k => {
+    $("tab-"+k).setAttribute("aria-selected", String(k === id));
+    $("panel-"+k).hidden = (k !== id);
+  });
+  if (location.hash !== "#t"+id) history.replaceState(null, "", "#t"+id);
+  redrawAll();
+}
+TABS.forEach(k => $("tab-"+k).addEventListener("click", () => showTab(k)));
+$("tabbar").addEventListener("keydown", e => {
+  const i = TABS.indexOf(activeTab);
+  if (e.key === "ArrowRight") { showTab(TABS[(i+1) % TABS.length]); $("tab-"+activeTab).focus(); }
+  if (e.key === "ArrowLeft") { showTab(TABS[(i+TABS.length-1) % TABS.length]); $("tab-"+activeTab).focus(); }
+});
+
+/* ================= TAB 1: basic principles ================= */
+let rotPhase = 0, rafA = 0;
+function P1(){
+  return {f: Math.pow(10, +$("a-f").value), amp: +$("a-amp").value/1000,
+          mod: Math.pow(10, +$("a-z").value), phi: +$("a-phi").value};
+}
+function drawTab1(){
+  const p = P1(), phi = p.phi*Math.PI/180, di = p.amp/p.mod;
+  $("o-a-f").textContent = hz(p.f);
+  $("o-a-amp").textContent = (+$("a-amp").value) + " mV";
+  $("o-a-z").textContent = ohm(p.mod);
+  $("o-a-phi").textContent = minus(p.phi.toFixed(0)) + "°";
+  const ink = cssv("--ink"), cath = cssv("--cathodic"), anod = cssv("--anodic"), soft = cssv("--ink-soft");
+
+  /* rotating vectors */
+  const th = rotPhase, N = 90;
+  const circ = Array.from({length:N+1}, (_,k) => 2*Math.PI*k/N);
+  const rr = eqRange($("c-rot"), 1.35, 1.35);
+  plot($("c-rot"), {xmin:-rr.xmax, xmax:rr.xmax, ymin:-rr.ymax, ymax:rr.ymax, xticks:[0], yticks:[0],
+    xlabel:"real axis", ylabel:"imaginary axis",
+    series:[{x:circ.map(Math.cos), y:circ.map(Math.sin), color:cssv("--plot-grid"), width:1.4},
+            {x:[0, Math.cos(th)], y:[0, Math.sin(th)], color:cath, width:3},
+            {x:[0, Math.cos(th - phi)], y:[0, Math.sin(th - phi)], color:anod, width:3}],
+    points:[{x:Math.cos(th), y:Math.sin(th), color:cath, r:5},
+            {x:Math.cos(th - phi), y:Math.sin(th - phi), color:anod, r:5}],
+    after:(ctx, X, Y, g) => {
+      const r = 0.42;
+      const a0 = th, a1 = th - phi;
+      ctx.strokeStyle = soft; ctx.lineWidth = 1.4; ctx.beginPath();
+      ctx.arc(X(0), Y(0), Math.abs(X(r)-X(0)), -a0, -a1, phi < 0);
+      ctx.stroke();
+      ctx.fillStyle = cssv("--ink"); ctx.font = "600 12.5px " + g.sans;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const am = (a0 + a1)/2;
+      ctx.fillText("φ", X(0.62*Math.cos(am)), Y(0.62*Math.sin(am)));
+      ctx.textAlign = "left"; ctx.textBaseline = "top";
+      ctx.fillStyle = soft; ctx.font = "500 12px " + g.sans;
+      ctx.fillText("ω", X(-1.3), Y(1.28));
+    }});
+
+  /* signals */
+  const cyc = 2, M = 500;
+  const ts = linspace(0, cyc, M);
+  plot($("c-sig"), {xmin:0, xmax:cyc, ymin:-1.3, ymax:1.3,
+    xlabel:"Time / periods", ylabel:"Normalized amplitude",
+    series:[{x:ts, y:ts.map(t => Math.sin(2*Math.PI*t)), color:cath, width:3},
+            {x:ts, y:ts.map(t => Math.sin(2*Math.PI*t - phi)), color:anod, width:2.6}],
+    vlines: reduceMotion ? [] : [{x:(th/(2*Math.PI)) % cyc, color:cssv("--rule"), dash:[3,4], width:1.2}]});
+
+  /* Lissajous */
+  const u = linspace(0, 1, 260);
+  const rl = eqRange($("c-lis"), 1.3, 1.3);
+  plot($("c-lis"), {xmin:-rl.xmax, xmax:rl.xmax, ymin:-rl.ymax, ymax:rl.ymax,
+    xlabel:"E, normalized", ylabel:"i, normalized",
+    series:[{x:u.map(t => Math.sin(2*Math.PI*t)), y:u.map(t => Math.sin(2*Math.PI*t - phi)),
+             color:ink, width:2.6}]});
+
+  $("r-a-w").textContent = sig3(2*Math.PI*p.f) + " rad s⁻¹";
+  $("r-a-T").textContent = secs(1/p.f);
+  $("r-a-pp").textContent = (2*(+$("a-amp").value)) + " mV";
+  $("r-a-rms").textContent = (0.7071*(+$("a-amp").value)).toFixed(1) + " mV";
+  $("r-a-di").textContent = di >= 1e-3 ? sig3(di*1e3) + " mA"
+    : di >= 1e-6 ? sig3(di*1e6) + " µA" : sig3(di*1e9) + " nA";
+  $("r-a-zr").textContent = ohm(p.mod*Math.cos(phi));
+  const zim = p.mod*Math.sin(phi);
+  $("r-a-zi").textContent = (zim < 0 ? minus("-") : "") + ohm(Math.abs(zim));
+  const ap = Math.abs(p.phi);
+  $("r-a-kind").textContent = ap < 5 ? "resistive" : ap > 85 ? (p.phi < 0 ? "capacitive" : "inductive")
+    : p.phi < 0 ? "mixed, capacitive" : "mixed, inductive";
+  $("r-a-state").textContent = p.phi === 0
+    ? "In phase: the current follows the potential instantly, as through a resistor. The ellipse collapses to a line."
+    : p.phi < 0
+      ? "The current reaches its peak " + Math.abs(p.phi).toFixed(0) + "° of a cycle before the potential, that is, "
+        + secs(Math.abs(p.phi)/360/p.f) + " earlier. Charging the double layer does this."
+      : "The current lags the potential by " + p.phi.toFixed(0) + "°, which in a cell usually means an inductive artifact "
+        + "or a relaxing adsorbed species.";
+}
+["a-f","a-amp","a-z","a-phi"].forEach(id => $(id).addEventListener("input", drawTab1));
+register(drawTab1);
+function animate(){
+  if ($("a-run").checked && activeTab === "1" && !reduceMotion){
+    rotPhase = (rotPhase + 0.028) % (2*Math.PI);
+    drawTab1();
+  }
+  rafA = requestAnimationFrame(animate);
+}
+$("a-run").addEventListener("change", drawTab1);
+if (!reduceMotion) rafA = requestAnimationFrame(animate);
+
+/* ================= TAB 2: model circuits ================= */
+const CIRCUITS = {
+  R:    {spec:[{t:"R",k:"r1",lab:"R",sub:"1"}], cdc:"R", show:["b-r1"]},
+  C:    {spec:[{t:"C",k:"c1",lab:"C",sub:"1"}], cdc:"C", show:["b-c1"]},
+  L:    {spec:[{t:"L",k:"l",lab:"L"}], cdc:"L", show:["b-l"]},
+  RC:   {spec:[{t:"R",k:"r1",lab:"R",sub:"1"},{t:"C",k:"c1",lab:"C",sub:"1"}], cdc:"RC", show:["b-r1","b-c1"]},
+  pRC:  {spec:[{par:[[{t:"C",k:"c1",lab:"C",sub:"1"}],[{t:"R",k:"r1",lab:"R",sub:"1"}]]}],
+         cdc:"(RC)", show:["b-r1","b-c1"]},
+  RpRC: {spec:[{t:"R",k:"r0",lab:"R",sub:"0"},
+               {par:[[{t:"C",k:"c1",lab:"C",sub:"1"}],[{t:"R",k:"r1",lab:"R",sub:"1"}]]}],
+         cdc:"R(RC)", show:["b-r0","b-r1","b-c1"]},
+  RpRCpRC: {spec:[{t:"R",k:"r0",lab:"R",sub:"0"},
+               {par:[[{t:"C",k:"c1",lab:"C",sub:"1"}],[{t:"R",k:"r1",lab:"R",sub:"1"}]]},
+               {par:[[{t:"C",k:"c2",lab:"C",sub:"2"}],[{t:"R",k:"r2",lab:"R",sub:"2"}]]}],
+         cdc:"R(RC)(RC)", show:["b-r0","b-r1","b-c1","b-r2","b-c2"]}
+};
+function drawTab2(){
+  const key = $("b-circ").value, C = CIRCUITS[key];
+  const V = {r0: Math.pow(10, +$("b-r0").value), r1: Math.pow(10, +$("b-r1").value),
+             c1: Math.pow(10, +$("b-c1").value), r2: Math.pow(10, +$("b-r2").value),
+             c2: Math.pow(10, +$("b-c2").value), l: Math.pow(10, +$("b-l").value)};
+  const fcur = Math.pow(10, +$("b-f").value);
+  $("o-b-r0").textContent = ohm(V.r0); $("o-b-r1").textContent = ohm(V.r1);
+  $("o-b-c1").textContent = farad(V.c1); $("o-b-r2").textContent = ohm(V.r2);
+  $("o-b-c2").textContent = farad(V.c2); $("o-b-l").textContent = sig3(V.l*1e6) + " µH";
+  $("o-b-f").textContent = hz(fcur);
+  ["b-r0","b-r1","b-c1","b-r2","b-c2","b-l"].forEach(id => {
+    const on = C.show.indexOf(id) >= 0;
+    $(id).closest(".ctl").style.opacity = on ? "1" : "0.32";
+    $(id).disabled = !on;
+  });
+  $("b-diagram").innerHTML = circuitSVG(C.spec);
+  $("b-cdc").textContent = "Description code: " + C.cdc;
+
+  const g = grid(-2, 6, 240);
+  const sp = spectrum(C.spec, V, g);
+  const cur = {f:fcur, Z: Zspec(C.spec, 2*Math.PI*fcur, V)};
+  drawNyquist($("c-b-nyq"), sp, cur, {cap: 1.6});
+  drawBodeMag($("c-b-mag"), sp, cur);
+  drawBodePhase($("c-b-pha"), sp, cur);
+
+  $("r-b-mod").textContent = ohm(cabs(cur.Z));
+  $("r-b-phi").textContent = minus(cdeg(cur.Z).toFixed(1)) + "°";
+  $("r-b-zr").textContent = ohm(cur.Z.re);
+  $("r-b-zi").textContent = (cur.Z.im > 0 ? minus("-") : "") + ohm(Math.abs(cur.Z.im));
+  const Zhi = Zspec(C.spec, 2*Math.PI*1e6, V), Zlo = Zspec(C.spec, 2*Math.PI*1e-2, V);
+  const big = v => cabs(v) > 1e9 ? "→ ∞" : ohm(cabs(v));
+  $("r-b-hf").textContent = big(Zhi);
+  $("r-b-lf").textContent = big(Zlo);
+  const has1 = C.show.indexOf("b-c1") >= 0 && C.show.indexOf("b-r1") >= 0;
+  const t1 = V.r1*V.c1, t2 = V.r2*V.c2;
+  if (key === "RpRCpRC"){
+    $("r-b-tau").textContent = secs(Math.min(t1,t2)) + " and " + secs(Math.max(t1,t2));
+    $("r-b-fc").textContent = hz(1/(2*Math.PI*Math.max(t1,t2))) + " and " + hz(1/(2*Math.PI*Math.min(t1,t2)));
+  } else if (has1){
+    $("r-b-tau").textContent = secs(t1);
+    $("r-b-fc").textContent = hz(1/(2*Math.PI*t1));
+  } else { $("r-b-tau").textContent = "–"; $("r-b-fc").textContent = "–"; }
+
+  const notes = {
+    R: "A single point on the real axis. Every frequency gives the same impedance, the magnitude is flat and the phase is zero: a resistor has no memory.",
+    C: "A vertical line up the imaginary axis. The magnitude falls with a slope of −1 on the log-log plot and the phase sits at −90° everywhere.",
+    L: "A vertical line below the real axis, with the phase at +90°. In a cell this shape at high frequency means cable inductance, not chemistry.",
+    RC: "The resistor shifts the capacitive line sideways to Z′ = R₁. The magnitude plateaus at R₁ at high frequency and the phase swings from 0° to −90°.",
+    pRC: "A semicircle through the origin. At high frequency the capacitor shorts out the resistor; at low frequency it blocks and all the current goes through R₁.",
+    RpRC: "The semicircle of (RC), displaced along the real axis by R₀. This is the shape of almost every electrochemical cell: two intercepts and an apex.",
+    RpRCpRC: "Two loops in series. Whether you see two semicircles depends entirely on the ratio of the time constants, which the readouts above give you."
+  };
+  $("r-b-state").textContent = notes[key];
+}
+bindInputs(["b-circ","b-r0","b-r1","b-c1","b-r2","b-c2","b-l","b-f"], drawTab2);
+
+/* ================= TAB 3: electrochemical systems ================= */
+function specFor(sys, n){
+  const ideal = n >= 0.999;
+  const dl = {t:"Q", dt: ideal ? "C" : "Q", k:"q", nk:"n",
+              lab: ideal ? "C" : "CPE", sub: ideal ? "dl" : "dl"};
+  const rct = {t:"R", k:"rct", lab:"R", sub:"ct"};
+  const w = {t:"W", k:"sig", lab:"Z", sub:"W"};
+  const ru = {t:"R", k:"ru", lab:"R", sub:"u"};
+  const cc = {t:"C", k:"cc", lab:"C", sub:"c"};
+  const rp = {t:"R", k:"rpore", lab:"R", sub:"pore"};
+  const dlName = ideal ? "Cdl" : "Qdl";
+  if (sys === "blocking") return {spec:[ru, dl], cdc:"Ru" + dlName};
+  if (sys === "kinetic") return {spec:[ru, {par:[[dl],[rct]]}], cdc:"Ru(" + dlName + "Rct)"};
+  if (sys === "randles") return {spec:[ru, {par:[[dl],[rct, w]]}], cdc:"Ru(" + dlName + "[RctW])"};
+  if (sys === "coated") return {spec:[ru, {par:[[cc],[rp, {par:[[dl],[rct]]}]]}],
+    cdc:"Ru(Cc[Rpore(" + dlName + "Rct)])"};
+  return {spec:[ru, {par:[[cc],[rp, {par:[[dl],[rct, w]]}]]}],
+    cdc:"Ru(Cc[Rpore(" + dlName + "[RctW])])"};
+}
+const SHOW3 = {
+  blocking: ["c-ru","c-cdl","c-n"],
+  kinetic:  ["c-ru","c-cdl","c-n","c-k0","c-conc"],
+  randles:  ["c-ru","c-cdl","c-n","c-k0","c-conc","c-D"],
+  coated:   ["c-ru","c-cdl","c-n","c-k0","c-conc","c-rpore","c-cc","c-expo"],
+  coatedW:  ["c-ru","c-cdl","c-n","c-k0","c-conc","c-D","c-rpore","c-cc","c-expo"]
+};
+function drawTab3(){
+  const sys = $("c-sys").value, nn = +$("c-n").value;
+  const k0 = Math.pow(10, +$("c-k0").value);
+  const conc = +$("c-conc").value*1e-6;          // mol cm^-3
+  const D = Math.pow(10, +$("c-D").value);
+  const A = 1, n = 1;
+  const i0 = n*F*k0*conc;
+  const coated = (sys === "coated" || sys === "coatedW");
+  const expo = coated ? Math.pow(10, +$("c-expo").value) : 1;
+  const Rct = R*T25/(n*F*i0*A)/expo;
+  const sig = R*T25/(n*n*F*F*A*Math.SQRT2)*(2/(Math.sqrt(D)*conc));
+  const V = {ru: Math.pow(10, +$("c-ru").value), q: +$("c-cdl").value*1e-6*expo, n: nn,
+             rct: Rct, sig: sig, rpore: Math.pow(10, +$("c-rpore").value),
+             cc: Math.pow(10, +$("c-cc").value)};
+  const fcur = Math.pow(10, +$("c-f").value);
+  $("o-c-ru").textContent = ohm(V.ru);
+  $("o-c-k0").textContent = sci(k0, 2) + " cm s⁻¹";
+  $("o-c-cdl").textContent = (+$("c-cdl").value) + (nn < 0.999 ? " µS sⁿ" : " µF");
+  $("o-c-conc").textContent = (+$("c-conc").value) + " mM";
+  $("o-c-D").textContent = sci(D, 2) + " cm² s⁻¹";
+  $("o-c-n").textContent = nn.toFixed(2) + (nn < 0.999 ? "" : " (ideal)");
+  $("o-c-rpore").textContent = ohm(V.rpore);
+  $("o-c-cc").textContent = farad(V.cc);
+  $("o-c-expo").textContent = coated ? sig3(expo*100) + "% of the area" : "n/a";
+  $("o-c-f").textContent = hz(fcur);
+  const show = SHOW3[sys];
+  ["c-ru","c-cdl","c-n","c-k0","c-conc","c-D","c-rpore","c-cc","c-expo"].forEach(id => {
+    const on = show.indexOf(id) >= 0;
+    $(id).closest(".ctl").style.opacity = on ? "1" : "0.32";
+    $(id).disabled = !on;
+  });
+  const sel = specFor(sys, nn);
+  if (sys === "blocking"){ V.rct = 1e14; V.sig = 0; }
+  if (sys === "kinetic" || sys === "coated"){ V.sig = 0; }
+  $("c-diagram").innerHTML = circuitSVG(sel.spec);
+  $("c-cdc").textContent = "Description code: " + sel.cdc;
+
+  const g = grid(-3, 6, 260);
+  const sp = spectrum(sel.spec, V, g);
+  const cur = {f:fcur, Z: Zspec(sel.spec, 2*Math.PI*fcur, V)};
+  drawNyquist($("c-c-nyq"), sp, cur, {cap: 1.7});
+  drawBodeMag($("c-c-mag"), sp, cur);
+  drawBodePhase($("c-c-pha"), sp, cur);
+
+  $("r-c-rct").textContent = sys === "blocking" ? "no faradaic path"
+    : ohm(Rct) + (coated ? " (scaled by the exposed area)" : "");
+  $("r-c-i0").textContent = sys === "blocking" ? "–" : sci(i0, 3) + " A cm⁻²";
+  $("r-c-sig").textContent = (sys === "randles" || sys === "coatedW") ? sig3(sig) + " Ω s^(−½)" : "not used";
+  const fc = 1/(2*Math.PI*Rct*V.q);
+  $("r-c-fc").textContent = sys === "blocking" ? "–" : hz(fc);
+  $("r-c-mod").textContent = ohm(cabs(cur.Z));
+  $("r-c-phi").textContent = minus(cdeg(cur.Z).toFixed(1)) + "°";
+  const phs = sp.map(d => -cdeg(d.Z));
+  $("r-c-phimax").textContent = Math.max.apply(null, phs).toFixed(1) + "°";
+  const Rw1 = sig/Math.sqrt(2*Math.PI*1);
+  $("r-c-ratio").textContent = (sys === "randles" || sys === "coatedW") ? sig3(Rct/Rw1) : "–";
+
+  const states = {
+    blocking: "No redox couple, so no faradaic path: the current can only charge the double layer. The spectrum is a vertical line rising from Ru, and its position gives the capacitance.",
+    kinetic: "One semicircle. Its left intercept is Ru, its diameter is Rct and its apex sits at 1/2πRctCdl. Lower k⁰ and the arc grows.",
+    randles: Rct/Rw1 > 3
+      ? "The arc is clearly separated from the 45° tail, so both kinetics and diffusion can be read off: Rct ≳ Rw means the semicircle is well defined."
+      : "Rct is now comparable with the Warburg resistance, so the semicircle is swallowed by the diffusion tail. The electrode is too fast for this measurement to report its kinetics.",
+    coated: "Two time constants: the fast one belongs to the film, the slow one to the metal underneath. Raise Rpore to simulate an intact coating and the low-frequency arc moves out of the measurable range.",
+    coatedW: "Two time constants plus a diffusion tail. This is the most complete of the five, and also the one where you should most distrust a fit with no independent evidence."
+  };
+  $("r-c-state").textContent = states[sys];
+}
+bindInputs(["c-sys","c-ru","c-k0","c-cdl","c-conc","c-D","c-n","c-rpore","c-cc","c-expo","c-f"], drawTab3);
+
+/* ================= TAB 4a: resolving two time constants ================= */
+function drawTab4a(){
+  const sep = +$("d-sep").value, bal = +$("d-ratio").value;
+  const R1 = 1000*Math.pow(10, -bal/2), R2 = 1000*Math.pow(10, bal/2);
+  const C1 = 1e-6, C2 = C1*Math.pow(10, sep);
+  const t1 = R1*C1, t2 = R2*C2;
+  $("o-d-sep").textContent = sig3(Math.pow(10, sep)) + "× apart";
+  $("o-d-ratio").textContent = sig3(R2/R1) + " : 1";
+  const spec = [{t:"R",k:"ru",lab:"R",sub:"u"},
+    {par:[[{t:"C",k:"c1",lab:"C",sub:"1"}],[{t:"R",k:"r1",lab:"R",sub:"1"}]]},
+    {par:[[{t:"C",k:"c2",lab:"C",sub:"2"}],[{t:"R",k:"r2",lab:"R",sub:"2"}]]}];
+  const V = {ru:50, r1:R1, c1:C1, r2:R2, c2:C2};
+  const g = grid(-3, 6, 300), sp = spectrum(spec, V, g);
+  const s1 = spectrum([{t:"R",k:"ru",lab:""},{par:[[{t:"C",k:"c1"}],[{t:"R",k:"r1"}]]}], V, g);
+  const s2 = spectrum([{t:"R",k:"ru",lab:""},{par:[[{t:"C",k:"c2"}],[{t:"R",k:"r2"}]]}], V, g);
+  const soft = cssv("--ink-soft");
+  drawNyquist($("c-d-nyq"), sp, null, {cap:1.5, extra:[
+    {x:s1.map(d=>d.Z.re), y:s1.map(d=>-d.Z.im), color:soft, dash:[6,5], width:1.6},
+    {x:s2.map(d=>d.Z.re), y:s2.map(d=>-d.Z.im), color:soft, dash:[6,5], width:1.6}]});
+  drawBodePhase($("c-d-pha"), sp, null);
+  /* count peaks in the phase curve */
+  const ph = sp.map(d => -cdeg(d.Z));
+  let peaks = 0;
+  for (let k = 2; k < ph.length-2; k++)
+    if (ph[k] > ph[k-1] && ph[k] > ph[k+1] && ph[k] > ph[k-2] && ph[k] > ph[k+2] && ph[k] > 8) peaks++;
+  $("r-d-t1").textContent = secs(Math.min(t1,t2));
+  $("r-d-t2").textContent = secs(Math.max(t1,t2));
+  const tr = Math.max(t1,t2)/Math.min(t1,t2);
+  $("r-d-tr").textContent = tr < 1.05 ? "1 (identical)" : sig3(tr);
+  $("r-d-pk").textContent = peaks;
+  $("r-d-state").textContent = tr > 100
+    ? "Well separated: two peaks in the phase and two arcs you could fit independently."
+    : tr > 10
+      ? "Partly resolved. The arcs overlap and a fit will trade one against the other, so the two sets of parameters are correlated."
+      : "Not resolved. Whatever the chemistry, this measurement sees one process, and fitting two would be inventing a parameter.";
+}
+bindInputs(["d-sep","d-ratio"], drawTab4a);
+
+/* ================= TAB 4b: coating degradation ================= */
+const COAT = [
+  {d:"0 days",  cc:0.354e-9, rp:5e9,  rct:5e10, cdl:1e-9},
+  {d:"1 day",   cc:0.40e-9,  rp:8e8,  rct:2e10, cdl:2e-9},
+  {d:"7 days",  cc:0.46e-9,  rp:4e7,  rct:4e9,  cdl:8e-9},
+  {d:"14 days", cc:0.52e-9,  rp:3e6,  rct:6e8,  cdl:4e-8},
+  {d:"30 days", cc:0.62e-9,  rp:2e5,  rct:1e7,  cdl:2e-7},
+  {d:"60 days", cc:0.78e-9,  rp:2e4,  rct:1e5,  cdl:5e-7}
+];
+const COATSPEC = [{t:"R",k:"ru",lab:"R",sub:"u"},
+  {par:[[{t:"C",k:"cc",lab:"C",sub:"c"}],
+        [{t:"R",k:"rp",lab:"R",sub:"pore"},{par:[[{t:"C",k:"cdl",lab:"C",sub:"dl"}],[{t:"R",k:"rct",lab:"R",sub:"ct"}]]}]]}];
+function coatV(s){ return {ru:30, cc:s.cc, rp:s.rp, cdl:s.cdl, rct:s.rct}; }
+function drawTab4b(){
+  const k = +$("e-day").value, s = COAT[k], A = 10;
+  $("o-e-day").textContent = s.d;
+  const g = grid(-2, 5, 200);
+  const cath = cssv("--cathodic"), soft = cssv("--ink-soft");
+  const extra = [];
+  for (let i = 0; i < COAT.length; i++){
+    if (i === k) continue;
+    const sp = spectrum(COATSPEC, coatV(COAT[i]), g);
+    extra.push({x: sp.map(d => Math.log10(d.f)), y: sp.map(d => Math.log10(cabs(d.Z))),
+      color: soft, width: 1.3});
+  }
+  const sp = spectrum(COATSPEC, coatV(s), g);
+  const lf = sp.map(d => Math.log10(d.f)), lm = sp.map(d => Math.log10(cabs(d.Z)));
+  const all = [].concat(lm, extra.reduce((a,e) => a.concat(e.y), []));
+  const ymin = Math.floor(Math.min.apply(null, all)) - 0.3, ymax = Math.ceil(Math.max.apply(null, all)) + 0.3;
+  plot($("c-e-bode"), {xmin:-2, xmax:5, ymin, ymax, logY:true, noZero:true,
+    xlabel:"f / Hz", ylabel:"|Z| / Ω", xfmt:logFmt, yfmt:logFmt,
+    xticks:[-2,-1,0,1,2,3,4,5], yticks:intTicks(ymin, ymax, 8),
+    series: extra.concat([{x:lf, y:lm, color:cath, width:3}])});
+  drawNyquist($("c-e-nyq"), sp, null, {cap:1.3});
+  const Z10 = cabs(Zspec(COATSPEC, 2*Math.PI*0.01, coatV(s)));
+  $("r-e-z").textContent = sci(Z10*A, 3) + " Ω cm²";
+  $("r-e-cc").textContent = farad(s.cc);
+  $("r-e-rp").textContent = s.rp > 1e8 ? "too large to measure" : ohm(s.rp);
+  const up = Math.log10(s.cc/COAT[0].cc)/Math.log10(80)*100;
+  $("r-e-up").textContent = up < 0.3 ? "0 (dry reference)" : up.toFixed(1) + " vol%";
+  $("r-e-rct").textContent = s.rct > 1e9 ? "beyond the measurable range" : ohm(s.rct);
+  if (s.rct > 1e9){ $("r-e-cr").textContent = "not measurable"; }
+  else {
+    const B = 0.026, icorr = B/(s.rct*A);
+    const CR = 3.27e-3*(icorr*1e6)*27.92/7.87;
+    $("r-e-cr").textContent = CR < 1e-3 ? sci(CR, 2) + " mm y⁻¹" : sig3(CR) + " mm y⁻¹";
+  }
+  const states = [
+    "A new coating is a near-perfect capacitor. The modulus rises with a slope of −1 across the whole range and there is no arc at all: nothing faradaic is measurable underneath.",
+    "Still essentially capacitive. The coating capacitance has crept up, which is water entering the polymer, long before anything else changes.",
+    "The first break appears at the high-frequency end as the pore resistance comes within range. Visual inspection would still show nothing.",
+    "Two time constants are now distinct. The electrolyte has reached the metal through the film and a corrosion reaction has started.",
+    "The low-frequency arc is well developed and a corrosion rate can be estimated. The low-frequency modulus has fallen by three decades from day one.",
+    "The coating is failing: |Z| at 10 mHz is near 10⁶ Ω cm², the usual line between protective and not. Note how small the corrosion rate still is — coatings work."
+  ];
+  $("r-e-state").textContent = states[k];
+}
+bindInputs(["e-day"], drawTab4b);
+
+/* ================= TAB 4c: biosensor ================= */
+function drawTab4c(){
+  const lc = +$("f-conc").value, lkd = +$("f-kd").value, noise = +$("f-noise").value/100;
+  const C = Math.pow(10, lc), Kd = Math.pow(10, lkd);
+  const Rct0 = 500, GAIN = 9;
+  const cov = C/(C + Kd);
+  const Rct = Rct0*(1 + GAIN*cov);
+  $("o-f-conc").textContent = sci(C, 2) + " M";
+  $("o-f-kd").textContent = sci(Kd, 2) + " M";
+  $("o-f-noise").textContent = (+$("f-noise").value) + "%";
+  const spec = [{t:"R",k:"ru",lab:"R",sub:"u"},{par:[[{t:"C",k:"q",lab:"C",sub:"dl"}],
+    [{t:"R",k:"rct",lab:"R",sub:"ct"},{t:"W",k:"sig",lab:"Z",sub:"W"}]]}];
+  const g = grid(-2, 5, 240);
+  const soft = cssv("--ink-soft"), cath = cssv("--cathodic");
+  const extra = [];
+  [-12,-11,-10,-9,-8,-7,-6].forEach(L => {
+    const cv = Math.pow(10, L), rr = Rct0*(1 + GAIN*cv/(cv+Kd));
+    const sp = spectrum(spec, {ru:100, q:20e-6, rct:rr, sig:120}, g);
+    extra.push({x: sp.map(d => d.Z.re), y: sp.map(d => -d.Z.im), color: soft, width:1.2});
+  });
+  const spSel = spectrum(spec, {ru:100, q:20e-6, rct:Rct, sig:120}, g);
+  const xs = [].concat(spSel.map(d=>d.Z.re), extra.reduce((a,e)=>a.concat(e.x), []));
+  const ys = [].concat(spSel.map(d=>-d.Z.im), extra.reduce((a,e)=>a.concat(e.y), []));
+  const r = eqRange($("c-f-nyq"), Math.max.apply(null, xs)*1.05, Math.max.apply(null, ys)*1.05);
+  plot($("c-f-nyq"), {xmin:0, xmax:r.xmax, ymin:0, ymax:r.ymax, noZero:true,
+    xlabel:"Z′ / Ω", ylabel:"−Z″ / Ω", xfmt:nfmt, yfmt:nfmt,
+    series: extra.concat([{x:spSel.map(d=>d.Z.re), y:spSel.map(d=>-d.Z.im), color:cath, width:3}])});
+  /* calibration */
+  const rnd = rng(17);
+  const pts = [], ls = [];
+  for (let L = -12; L <= -6; L += 0.1){
+    const cv = Math.pow(10, L);
+    ls.push({x:L, y: GAIN*cv/(cv+Kd)*100});
+  }
+  for (let L = -12; L <= -6; L += 0.5){
+    const cv = Math.pow(10, L), sig = GAIN*cv/(cv+Kd)*100;
+    pts.push({x:L, y: sig + noise*100*gaussFrom(rnd)*0.5, color: cath, r:3.6});
+  }
+  plot($("c-f-cal"), {xmin:-12.3, xmax:-5.7, ymin:-noise*120, ymax: GAIN*110, noZero:true,
+    xlabel:"Analyte concentration / M", ylabel:"Change in R_ct / %", xfmt:logFmt,
+    xticks:[-12,-11,-10,-9,-8,-7,-6],
+    series:[{x:ls.map(d=>d.x), y:ls.map(d=>d.y), color:cssv("--ink"), width:2.4}],
+    points: pts.concat([{x:lc, y: GAIN*cov*100, color:cssv("--anodic"), r:6}]),
+    hlines:[{y: noise*300, color:cssv("--transport"), dash:[6,5], width:1.5}],
+    after:(ctx, X, Y, gg) => { ctx.fillStyle = cssv("--transport"); ctx.font = "600 12px " + gg.sans;
+      ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+      ctx.fillText("3σ detection limit", X(-12.2), Y(noise*300) - 4); }});
+  $("r-f-r0").textContent = ohm(Rct0);
+  $("r-f-r1").textContent = ohm(Rct);
+  $("r-f-sig").textContent = (GAIN*cov*100).toFixed(1) + "%";
+  $("r-f-cov").textContent = (cov*100).toFixed(1) + "%";
+  const sigPct = GAIN*cov*100, lod = noise*300;
+  $("r-f-state").textContent = sigPct < lod
+    ? "Below the detection limit: the change in Rct is smaller than three times the electrode-to-electrode scatter, so this concentration is not distinguishable from a blank."
+    : cov > 0.9
+      ? "Saturated. Nearly every binding site is occupied, so the arc stops growing and the sensor can no longer tell one concentration from a higher one."
+      : "In the working range. The response is near-linear in log C here, which is the only region where a calibration curve is meaningful.";
+}
+bindInputs(["f-conc","f-kd","f-noise"], drawTab4c);
+
+/* ================= TAB 4d: inductive behaviour ================= */
+function drawTab4d(){
+  const kind = $("g-kind").value, mag = Math.pow(10, +$("g-mag").value), Rct = Math.pow(10, +$("g-rct").value);
+  $("o-g-rct").textContent = ohm(Rct);
+  const Ru = 5, Cdl = 20e-6;
+  let Zf, label;
+  if (kind === "cable"){
+    const L = mag*1e-7;
+    $("o-g-mag").textContent = sig3(L*1e6) + " µH";
+    Zf = w => {
+      const dl = CX(0, -1/(w*Cdl)), far = CX(Rct, 0);
+      const par = cinv(cadd(cinv(dl), cinv(far)));
+      return cadd(cadd(CX(Ru,0), par), CX(0, w*L));
+    };
+    label = "cable";
+  } else {
+    const L = mag*30, RL = Rct*0.6;
+    $("o-g-mag").textContent = sig3(L) + " H (adsorption relaxation)";
+    Zf = w => {
+      const dl = CX(0, -1/(w*Cdl));
+      const ind = cadd(CX(RL,0), CX(0, w*L));
+      const far = cinv(cadd(cinv(CX(Rct,0)), cinv(ind)));
+      return cadd(CX(Ru,0), cinv(cadd(cinv(dl), cinv(far))));
+    };
+    label = "adsorption";
+  }
+  const g = kind === "cable" ? grid(0, 7, 300) : grid(-3, 5, 300);
+  const sp = g.map(f => ({f, Z: Zf(2*Math.PI*f)}));
+  drawNyquist($("c-g-nyq"), sp, null, {});
+  drawBodePhase($("c-g-pha"), sp, null);
+  const pos = sp.filter(d => -cdeg(d.Z) < -0.5);
+  $("r-g-n").textContent = pos.length + " of " + sp.length;
+  $("r-g-flo").textContent = pos.length ? hz(Math.min.apply(null, pos.map(d => d.f))) : "none";
+  $("r-g-fhi").textContent = pos.length ? hz(Math.max.apply(null, pos.map(d => d.f))) : "none";
+  $("r-g-state").textContent = kind === "cable"
+    ? (pos.length
+        ? "The loop sits at the top of the frequency range and grows with lead length: this is an artifact. Shorten and twist the cables, or simply stop the sweep below it."
+        : "At this cell impedance the lead inductance is invisible. Lower Rct toward a few ohms, as in a battery or a fuel cell, and the tail appears.")
+    : "The loop sits at the bottom of the range, below the capacitive arc. That is the signature of an adsorbed intermediate relaxing, and it is information about the mechanism rather than noise.";
+}
+bindInputs(["g-kind","g-mag","g-rct"], drawTab4d);
+
+/* ================= TAB 4e: manual fitting ================= */
+function Zfit(p, f){
+  const w = 2*Math.PI*f;
+  let far = CX(p.Rct, 0);
+  if (p.sigma > 0) far = cadd(far, CX(p.sigma/Math.sqrt(w), -p.sigma/Math.sqrt(w)));
+  const dl = (p.n != null && p.n < 0.999) ? Zcpe(w, p.Q, p.n) : CX(0, -1/(w*p.Q));
+  let Z = cinv(cadd(cinv(far), cinv(dl)));
+  if (p.coating) Z = cinv(cadd(cinv(cadd(CX(p.Rpore,0), Z)), cinv(CX(0, -1/(w*p.Cc)))));
+  return cadd(CX(p.Rs, 0), Z);
+}
+const TRUTH = {
+  ideal:   {Rs:25, Rct:1200, Q:40e-6, n:1, sigma:0, coating:false},
+  cpe:     {Rs:25, Rct:1200, Q:60e-6, n:0.85, sigma:0, coating:false},
+  warburg: {Rs:25, Rct:400, Q:30e-6, n:1, sigma:120, coating:false},
+  coating: {Rs:30, Rct:2e5, Q:2e-6, n:1, sigma:0, Rpore:1.2e5, Cc:1.5e-9, coating:true}
+};
+let fitSeed = 11, fitUser = null, fitRevealed = false;
+function fitData(){
+  if (fitUser) return fitUser;
+  const truth = TRUTH[$("h-data").value], rnd = rng(fitSeed), lvl = +$("h-noise").value/100;
+  const g = grid(-2, 5, 50);
+  return g.map(f => {
+    const Z = Zfit(truth, f), m = cabs(Z);
+    return {f, Z: CX(Z.re*(1 + lvl*gaussFrom(rnd)) + m*lvl*0.3*gaussFrom(rnd),
+                     Z.im*(1 + lvl*gaussFrom(rnd)) - m*lvl*0.3*gaussFrom(rnd))};
+  });
+}
+function fitParams(){
+  const m = $("h-model").value;
+  return {Rs:+$("h-rs").value, Rct:Math.pow(10, +$("h-rct").value), Q:Math.pow(10, +$("h-q").value),
+    n:(m === "randlesCPE" || m === "randlesCPEW") ? +$("h-n").value : 1,
+    sigma:(m === "randlesW" || m === "randlesCPEW") ? Math.pow(10, +$("h-sigma").value) : 0,
+    Rpore:Math.pow(10, +$("h-rpore").value), Cc:Math.pow(10, +$("h-cc").value),
+    coating: m === "coating"};
+}
+function drawTab4e(){
+  const data = fitData(), p = fitParams(), m = $("h-model").value;
+  $("o-h-noise").textContent = (+$("h-noise").value).toFixed(1) + "%";
+  $("o-h-rs").textContent = ohm(p.Rs);
+  $("o-h-rct").textContent = ohm(p.Rct);
+  $("o-h-q").textContent = p.n < 0.999 ? sci(p.Q, 3) + " S sⁿ" : farad(p.Q);
+  $("o-h-n").textContent = p.n.toFixed(2) + ((m === "randlesCPE" || m === "randlesCPEW") ? "" : " (unused)");
+  $("o-h-sigma").textContent = (m === "randlesW" || m === "randlesCPEW") ? sig3(p.sigma) + " Ω s^(−½)" : "unused";
+  $("o-h-rpore").textContent = m === "coating" ? ohm(p.Rpore) : "unused";
+  $("o-h-cc").textContent = m === "coating" ? farad(p.Cc) : "unused";
+  const fit = data.map(d => ({f:d.f, Z: Zfit(p, d.f)}));
+  const cath = cssv("--cathodic"), ink = cssv("--ink"), tr = cssv("--transport");
+  const lim = Math.max(Math.max.apply(null, data.map(d => d.Z.re)),
+                       Math.max.apply(null, fit.map(d => d.Z.re)))*1.08;
+  const ylimN = Math.max(Math.max.apply(null, data.map(d => -d.Z.im)),
+                         Math.max.apply(null, fit.map(d => -d.Z.im)))*1.15;
+  plot($("c-h-nyq"), {xmin:0, xmax:lim, ymin:0, ymax:Math.max(ylimN, lim*0.55), noZero:true,
+    xlabel:"Z′ / Ω", ylabel:"−Z″ / Ω",
+    series:[{x:fit.map(d => d.Z.re), y:fit.map(d => -d.Z.im), color:ink, dash:[8,5], width:2.2}],
+    points: data.map(d => ({x:d.Z.re, y:-d.Z.im, color:cath, r:3.6}))});
+  const lfs = data.map(d => Math.log10(d.f));
+  const lm = data.map(d => Math.log10(cabs(d.Z))), lmf = fit.map(d => Math.log10(cabs(d.Z)));
+  const ymin = Math.floor(Math.min.apply(null, [].concat(lm, lmf))) - 0.3;
+  const ymax = Math.ceil(Math.max.apply(null, [].concat(lm, lmf))) + 0.3;
+  plot($("c-h-bode"), {xmin:-2, xmax:5, ymin, ymax, logY:true, noZero:true,
+    xlabel:"f / Hz", ylabel:"|Z| / Ω  (phase scaled)", xfmt:logFmt, yfmt:logFmt,
+    xticks:[-2,-1,0,1,2,3,4,5], yticks:intTicks(ymin, ymax, 7),
+    series:[{x:lfs, y:lmf, color:ink, dash:[8,5], width:2.2},
+            {x:lfs, y:data.map(d => ymin + (-cdeg(d.Z))/90*(ymax-ymin)), color:tr, width:2},
+            {x:lfs, y:fit.map(d => ymin + (-cdeg(d.Z))/90*(ymax-ymin)), color:ink, dash:[3,4], width:1.6}],
+    points: data.map((d,k) => ({x:lfs[k], y:lm[k], color:cath, r:3.2}))});
+  const resR = data.map((d,k) => (d.Z.re - fit[k].Z.re)/cabs(d.Z)*100);
+  const resI = data.map((d,k) => (d.Z.im - fit[k].Z.im)/cabs(d.Z)*100);
+  const span = Math.max(3, Math.min(60, Math.max(Math.max.apply(null, resR.map(Math.abs)),
+    Math.max.apply(null, resI.map(Math.abs)))*1.2));
+  plot($("c-h-res"), {xmin:-2, xmax:5, ymin:-span, ymax:span,
+    xlabel:"f / Hz", ylabel:"Residual / % of |Z|", xfmt:logFmt, xticks:[-2,-1,0,1,2,3,4,5],
+    series:[{x:lfs, y:resR, color:cath, width:2}, {x:lfs, y:resI, color:cssv("--anodic"), width:2}],
+    points: lfs.reduce((a,x,k) => a.concat([{x, y:resR[k], color:cath, r:3},
+      {x, y:resI[k], color:cssv("--anodic"), r:3}]), [])});
+  const chi = data.reduce((s,d,k) => s + (resR[k]*resR[k] + resI[k]*resI[k])/1e4, 0)/(2*data.length);
+  $("r-h-chi").textContent = sig3(chi*1e3);
+  const worst = Math.max(Math.max.apply(null, resR.map(Math.abs)), Math.max.apply(null, resI.map(Math.abs)));
+  $("r-h-max").textContent = worst.toFixed(1) + "%";
+  let runs = 1;
+  for (let k = 1; k < resR.length; k++) if (Math.sign(resR[k]) !== Math.sign(resR[k-1])) runs++;
+  const random = runs > resR.length*0.35;
+  $("r-h-pat").textContent = random ? "random, good" : "systematic, model suspect";
+  $("r-h-ceff").textContent = p.n < 0.999
+    ? farad(Math.pow(p.Q*Math.pow(1/p.Rs + 1/p.Rct, p.n - 1), 1/p.n)) : farad(p.Q);
+  $("r-h-hint").textContent = fitUser
+    ? "Fitting your pasted spectrum. The true values are unknown, so the residuals are the only judge."
+    : (random && worst < 3*(+$("h-noise").value + 0.5))
+      ? "Residuals look like noise: this model can describe the data."
+      : "The residuals bend with frequency. Either a parameter is off, or the circuit is missing an element.";
+  if (fitRevealed && !fitUser){
+    const t = TRUTH[$("h-data").value];
+    $("r-h-true").textContent = "Generated with Ru = " + ohm(t.Rs) + ", Rct = " + ohm(t.Rct)
+      + (t.coating ? ", Rpore = " + ohm(t.Rpore) + ", Cc = " + farad(t.Cc) + ", Cdl = " + farad(t.Q)
+                   : ", " + (t.n < 1 ? "Q = " + sci(t.Q, 3) + " S sⁿ with n = " + t.n : "Cdl = " + farad(t.Q)))
+      + (t.sigma ? ", σ = " + t.sigma + " Ω s^(−½)" : "") + ".";
+  }
+}
+bindInputs(["h-data","h-model","h-noise","h-rs","h-rct","h-q","h-n","h-sigma","h-rpore","h-cc"], drawTab4e);
+$("h-new").addEventListener("click", () => { fitSeed = (fitSeed*31 + 7) | 0; drawTab4e(); });
+$("h-reveal").addEventListener("click", () => {
+  fitRevealed = !fitRevealed; $("r-h-true").hidden = !fitRevealed;
+  $("h-reveal").textContent = fitRevealed ? "Hide the true values" : "Show the true values";
+  drawTab4e();
+});
+$("h-use").addEventListener("click", () => {
+  const rows = $("h-csv").value.trim().split(/\r?\n/), out = [];
+  rows.forEach(line => {
+    const v = line.split(/[,;\t ]+/).map(Number).filter(x => isFinite(x));
+    if (v.length >= 3 && v[0] > 0) out.push({f:v[0], re:v[1], im:v[2]});
+  });
+  if (out.length < 5){ $("r-h-csv").textContent = "Could not read at least five rows of f, Z′, Z″."; return; }
+  const capacitive = out.filter(o => o.im < 0).length > out.length/2;
+  fitUser = out.map(o => ({f:o.f, Z: CX(o.re, capacitive ? o.im : -o.im)})).sort((a,b) => b.f - a.f);
+  $("r-h-csv").textContent = out.length + " points loaded, Z″ read as "
+    + (capacitive ? "negative" : "positive") + " for capacitive behaviour.";
+  fitRevealed = false; $("r-h-true").hidden = true;
+  drawTab4e();
+});
+$("h-sim").addEventListener("click", () => { fitUser = null; $("r-h-csv").textContent = ""; drawTab4e(); });
+
+/* ================= lifecycle ================= */
+let rq = 0;
+window.addEventListener("resize", () => { cancelAnimationFrame(rq); rq = requestAnimationFrame(redrawAll); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(redrawAll);
+const hash = (location.hash || "").replace("#t", "");
+showTab(TABS.indexOf(hash) >= 0 ? hash : "1");
+redrawAll();
+})();
+</script>
+</body>
+</html>
